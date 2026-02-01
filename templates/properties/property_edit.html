@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Property - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0"><i class="fas fa-edit text-primary"></i> Edit Property</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" action="">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+
+                        <hr>
+                        <h5>Current Images</h5>
+                        <div class="row mb-3">
+                            {% for img in images %}
+                                <div class="col-md-3 mb-3">
+                                    <div class="card">
+                                        <img src="{{ img.image.url }}" class="card-img-top" alt="{{ img.caption }}">
+                                        <div class="card-body p-2">
+                                            <p class="card-text small">{{ img.caption|default:"No caption" }}</p>
+                                            {% if img.is_primary %}
+                                                <span class="badge bg-primary">Primary</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="col-12">
+                                    <p class="text-muted">No images yet. Add some below.</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex justify-content-end mb-4">
+                            <button type="submit" class="btn btn-primary">Update Property</button>
+                        </div>
+                    </form>
+
+                    <!-- Separate form for image uploads -->
+                    <hr>
+                    <h5>Add More Images</h5>
+                    <form method="post" enctype="multipart/form-data" action="{% url 'properties:property_add_images' property.slug %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="images" class="form-label">Select Images</label>
+                            <input type="file" name="images" id="images" class="form-control" multiple accept="image/*" required>
+                            <div class="form-text">You can upload multiple images at once. First image will be set as primary if none exists.</div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success">Upload Images</button>
+                        </div>
+                    </form>
+
+                    <hr>
+                    <h5>Videos</h5>
+                    <div class="row">
+                        {% for vid in videos %}
+                            <div class="col-md-4 mb-3">
+                                <video src="{{ vid.video.url }}" controls class="w-100"></video>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No videos yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

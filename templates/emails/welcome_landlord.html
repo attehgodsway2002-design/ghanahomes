@@ -1,0 +1,47 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="color: #FFA500; margin-top: 0;">Welcome to GhanaHomes - Landlord Portal! 🏠</h2>
+<p>Hello {{ user.first_name|default:user.username }},</p>
+<p>Welcome to GhanaHomes! You're now registered as a <strong>Property Manager/Landlord</strong>. Here's what you can do on our platform:</p>
+
+<div style="background-color: #f8f9fa; border-left: 4px solid #FFA500; padding: 15px; margin: 20px 0; border-radius: 3px;">
+    <p style="margin: 0; color: #333; font-size: 14px;">
+        <strong>🎯 Your Capabilities:</strong>
+    </p>
+    <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #666; font-size: 14px;">
+        <li>Post unlimited properties (based on your subscription plan)</li>
+        <li>Manage property details, images, and videos</li>
+        <li>Track inquiries and messages from tenants</li>
+        <li>Chat directly with interested tenants</li>
+        <li>View detailed property analytics and view counts</li>
+        <li>Feature properties to increase visibility</li>
+        <li>Manage subscription plans and upgrade anytime</li>
+    </ul>
+</div>
+
+<h3 style="color: #333; margin-top: 25px;">Getting Started:</h3>
+<ol style="color: #666; font-size: 14px;">
+    <li><strong>Subscribe to a Plan</strong> - Choose a plan that suits your needs</li>
+    <li><strong>Complete Your Profile</strong> - Add your photo and business details</li>
+    <li><strong>Post Your First Property</strong> - Add property details, images, and pricing</li>
+    <li><strong>Wait for Inquiries</strong> - Tenants will reach out with questions</li>
+    <li><strong>Chat & Negotiate</strong> - Connect directly with potential tenants</li>
+</ol>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{ dashboard_url }}" style="background-color: #FFA500; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Go to Dashboard</a>
+</div>
+
+<div style="background-color: #e8f4f8; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 3px;">
+    <p style="margin: 0; color: #0c5460; font-size: 14px;">
+        <strong>💡 Pro Tip:</strong> High-quality photos and detailed descriptions attract more inquiries. Make sure to upload clear images of your properties!
+    </p>
+</div>
+
+<p style="color: #666; font-size: 14px; margin-top: 20px;">
+    <strong>Questions?</strong> Check our <a href="#" style="color: #FFA500; text-decoration: none;">Landlord Help Center</a> or <a href="#" style="color: #FFA500; text-decoration: none;">contact support</a>.
+</p>
+
+<p>Best regards,<br><strong>The GhanaHomes Team</strong></p>
+{% endblock %}

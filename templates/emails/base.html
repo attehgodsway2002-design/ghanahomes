@@ -1,0 +1,31 @@
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #FFA500; padding-bottom: 20px;">
+            <h1 style="color: #FFA500; margin: 0;">GhanaHomes</h1>
+            <p style="color: #666; font-size: 14px; margin: 5px 0 0 0;">Your Property Management Partner</p>
+        </div>
+
+        <!-- Main Content -->
+        <div style="margin: 30px 0;">
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- Footer -->
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+        <div style="text-align: center; color: #999; font-size: 12px;">
+            <p style="margin: 10px 0;">
+                <strong>GhanaHomes</strong> by <strong>Huntsmen</strong><br>
+                Your trusted property rental platform
+            </p>
+            <p style="margin: 10px 0; font-size: 11px;">
+                If you didn't request this email, please ignore it or <a href="#" style="color: #FFA500; text-decoration: none;">contact support</a>.
+            </p>
+            <p style="margin: 10px 0; font-size: 11px;">
+                © {% now "Y" %} <strong>Huntsmen</strong>. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

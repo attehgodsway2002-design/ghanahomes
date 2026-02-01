@@ -1,0 +1,45 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #FF6B35; text-align: center; margin-bottom: 24px;">⚠️ New Verification Request</h2>
+    
+    <p>A new account verification request has been submitted.</p>
+    
+    <div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <h4 style="margin-top: 0; color: #92400E;">Request Details</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="border-bottom: 1px solid #FCD34D;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666; width: 40%;">User:</td>
+                <td style="padding: 8px 0;"><a href="{{ admin_user_url }}" style="color: #FF6B35; text-decoration: none; font-weight: 600;">{{ user.get_full_name|default:user.username }}</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #FCD34D;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Email:</td>
+                <td style="padding: 8px 0;"><a href="mailto:{{ user.email }}" style="color: #FF6B35;">{{ user.email }}</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #FCD34D;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Company:</td>
+                <td style="padding: 8px 0;">{{ user.company_name|default:"Not provided" }}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #FCD34D;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">License #:</td>
+                <td style="padding: 8px 0;">{{ license_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Submitted:</td>
+                <td style="padding: 8px 0;">{{ submitted_date }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div style="text-align: center; margin: 24px 0;">
+        <a href="{{ admin_verification_url }}" style="display: inline-block; background-color: #FF6B35; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: 600;">
+            Review Request →
+        </a>
+    </div>
+    
+    <p style="color: #666; font-size: 13px;">
+        Document uploaded. Please review and approve or decline.
+    </p>
+</div>
+{% endblock %}

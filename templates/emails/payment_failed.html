@@ -1,0 +1,71 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #dc3545; margin-bottom: 20px;">⚠️ Payment Failed</h2>
+        
+        <p>Hello {{ user.first_name|default:user.username }},</p>
+        
+        <p>Your payment attempt was unsuccessful. Please review the details below and try again.</p>
+        
+        <div style="background-color: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #721c24;">
+                <strong>❌ Status:</strong> Payment Failed
+            </p>
+        </div>
+        
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Amount:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₵{{ amount }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Plan:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">{{ plan_name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Reference:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">{{ reference_code }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Failure Reason:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">{{ failure_reason }}</td>
+            </tr>
+        </table>
+        
+        <h3 style="color: #333; margin-top: 25px;">Common Reasons for Payment Failure:</h3>
+        <ul style="color: #666;">
+            <li><strong>Insufficient Funds</strong> - Your account or card doesn't have enough balance</li>
+            <li><strong>Expired Card</strong> - Your card's expiration date has passed</li>
+            <li><strong>Invalid Card Details</strong> - Incorrect card information entered</li>
+            <li><strong>Declined by Bank</strong> - Your bank declined the transaction for security reasons</li>
+            <li><strong>Connection Error</strong> - Network issue during payment processing</li>
+        </ul>
+        
+        <h3 style="color: #333; margin-top: 25px;">What You Can Do:</h3>
+        <ol style="color: #666;">
+            <li>Verify your payment method is valid and not expired</li>
+            <li>Ensure you have sufficient funds</li>
+            <li>Try using a different payment method</li>
+            <li>Contact your bank to check for any restrictions</li>
+            <li>Retry the payment in a few moments</li>
+        </ol>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ retry_url }}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                Try Payment Again
+            </a>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="margin: 0; color: #666; font-size: 13px;">
+                <strong>Need help?</strong> If you continue to experience issues with your payment, please <a href="mailto:realhuntsmen.tech@gmail.com" style="color: #0d6efd; text-decoration: none;">contact our support team</a>.
+            </p>
+        </div>
+        
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

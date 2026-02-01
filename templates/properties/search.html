@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Properties - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Search Results</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            {% if properties %}
+                <div class="list-group">
+                    {% for prop in properties %}
+                        <a href="{% url 'properties:property_detail' prop.slug %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ prop.title }}</h5>
+                                <small>₵{{ prop.price }}</small>
+                            </div>
+                            <p class="mb-1 text-muted">{{ prop.description|truncatewords:25 }}</p>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No properties found.</p>
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            <h5>Search Filters</h5>
+            <form method="get">
+                {{ form.as_p }}
+                <button class="btn btn-primary" type="submit">Filter</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

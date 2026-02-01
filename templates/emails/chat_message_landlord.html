@@ -1,0 +1,13 @@
+<p>Hi {{ recipient.get_full_name_or_username }},</p>
+
+<p>You have received a new message from {{ sender.get_full_name_or_username }} regarding your property "{{ chat_room.property.title }}".</p>
+
+<p>Message preview:</p>
+<blockquote>{{ message.content }}</blockquote>
+
+<p>You can reply to this message by visiting the chat on GhanaHomes:</p>
+<p><a href="{{ site_url }}{% url 'chat:chat_room' room_id=chat_room.id %}">View Conversation</a></p>
+
+<p>If you no longer wish to receive these notifications, update your notification preferences in your account settings.</p>
+
+<p>— GhanaHomes</p>

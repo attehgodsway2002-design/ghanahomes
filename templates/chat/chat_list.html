@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messages - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-comments text-primary"></i> Messages
+                    </h4>
+                </div>
+                
+                <div class="card-body p-0">
+                    {% if chat_rooms %}
+                        <div class="list-group list-group-flush">
+                            {% for room in chat_rooms %}
+                                <a href="{% url 'chat:chat_room' room.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <!-- Property Image -->
+                                        <div class="flex-shrink-0">
+                                            {% if room.property.images.exists %}
+                                                <img src="{{ room.property.images.first.image.url }}" 
+                                                     alt="{{ room.property.title }}" 
+                                                     class="rounded"
+                                                     style="width: 64px; height: 64px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                                     style="width: 64px; height: 64px;">
+                                                    <i class="fas fa-home text-muted fa-lg"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Chat Details -->
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0">
+                                                    {% if user.is_landlord %}
+                                                        {{ room.tenant.get_full_name|default:room.tenant.username }}
+                                                    {% else %}
+                                                        {{ room.landlord.get_full_name|default:room.landlord.username }}
+                                                    {% endif %}
+                                                </h6>
+                                                <small class="text-muted">
+                                                    {{ room.updated_at|timesince }} ago
+                                                </small>
+                                            </div>
+                                            
+                                            <p class="mb-1 text-truncate">
+                                                <small class="text-muted">Re: {{ room.property.title }}</small>
+                                            </p>
+                                            
+                                            {% with last_message=room.messages.last %}
+                                                {% if last_message %}
+                                                    <p class="mb-0 text-truncate {% if not last_message.is_read and last_message.sender != user %}fw-bold{% endif %}">
+                                                        {% if last_message.sender == user %}
+                                                            <span class="text-muted">You:</span>
+                                                        {% endif %}
+                                                        {{ last_message.content }}
+                                                    </p>
+                                                {% endif %}
+                                            {% endwith %}
+                                            
+                                            <!-- Unread Badge -->
+                                            {% with unread_count=room.unread_count %}
+                                                {% if unread_count > 0 %}
+                                                    <span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger mt-3 me-3">
+                                                        {{ unread_count }}
+                                                        <span class="visually-hidden">unread messages</span>
+                                                    </span>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-comments text-muted fa-3x"></i>
+                            </div>
+                            <h5>No Messages Yet</h5>
+                            <p class="text-muted mb-0">
+                                {% if user.is_landlord %}
+                                    Messages from interested tenants will appear here.
+                                {% else %}
+                                    Start a conversation by viewing a property and clicking "Contact Landlord".
+                                {% endif %}
+                            </p>
+                            
+                            {% if not user.is_landlord %}
+                                <a href="{% url 'properties:property_list' %}" class="btn btn-primary mt-3">
+                                    <i class="fas fa-search"></i> Browse Properties
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .list-group-item-action {
+        position: relative;
+        transition: all 0.2s;
+    }
+    .list-group-item-action:hover {
+        transform: translateX(5px);
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

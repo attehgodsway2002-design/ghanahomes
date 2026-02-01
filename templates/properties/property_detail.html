@@ -1,0 +1,895 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ property.title }} - GhanaHomes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .property-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .property-header h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .property-header .location {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .property-price {
+        font-size: 1.6rem;
+        font-weight: bold;
+    }
+
+    .gallery-container {
+        position: relative;
+        width: 100%;
+        height: 350px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f0f0f0;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .main-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .main-image:hover {
+        transform: scale(1.02);
+    }
+
+    .gallery-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .gallery-nav:hover {
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    .gallery-nav.prev {
+        left: 10px;
+    }
+
+    .gallery-nav.next {
+        right: 10px;
+    }
+
+    .gallery-counter {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        z-index: 10;
+    }
+
+    .featured-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #ffc107;
+        color: #000;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+
+    .thumbnail-row {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        margin-bottom: 1rem;
+    }
+
+    .thumbnail {
+        flex-shrink: 0;
+        width: 70px;
+        height: 60px;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 2px solid #ddd;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .thumbnail:hover, .thumbnail.active {
+        border-color: #007bff;
+        transform: scale(1.05);
+    }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        text-align: center;
+        padding: 1rem 0;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        margin: 1rem 0;
+    }
+
+    .stat-item {
+        font-size: 0.9rem;
+    }
+
+    .stat-item .icon {
+        font-size: 1.5rem;
+        color: #007bff;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-item .value {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+    }
+
+    .section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border: 1px solid #eee;
+    }
+
+    .section h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section h3 i {
+        color: #007bff;
+    }
+
+    .amenity-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: #f0f7ff;
+        border: 1px solid #007bff;
+        border-radius: 20px;
+        margin: 4px;
+        font-size: 0.85rem;
+        color: #007bff;
+    }
+
+    .amenity-badge i {
+        color: #007bff;
+    }
+
+    #map {
+        width: 100%;
+        height: 350px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+
+    .leaflet-container {
+        border-radius: 8px;
+    }
+
+    .video-container {
+        width: 100%;
+        height: 250px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #000;
+    }
+
+    .video-container video {
+        width: 100%;
+        height: 100%;
+    }
+
+    .review-item {
+        padding: 1rem;
+        background: #f9f9f9;
+        border-radius: 6px;
+        margin-bottom: 0.8rem;
+        border-left: 3px solid #007bff;
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .review-author {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .review-date {
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    .review-rating {
+        color: #ffc107;
+        font-size: 0.9rem;
+        margin: 0.25rem 0;
+    }
+
+    .review-comment {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .owner-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        position: sticky;
+        top: 20px;
+    }
+
+    .owner-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 0.5rem;
+        border: 3px solid white;
+    }
+
+    .owner-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0 auto 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: 3px solid white;
+    }
+
+    .owner-name {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+    }
+
+    .owner-company {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+
+    .owner-badge {
+        display: inline-block;
+        background: #28a745;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .owner-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .owner-buttons .btn {
+        background: white;
+        color: #007bff;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    .owner-buttons .btn:hover {
+        background: #f0f0f0;
+    }
+
+    .owner-buttons .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .owner-buttons .btn-success:hover {
+        background: #20c997;
+    }
+
+    .owner-buttons .btn-phone {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .owner-buttons .btn-phone:hover {
+        background: #138496;
+    }
+
+    .stats-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .stats-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stats-list li:last-child {
+        border-bottom: none;
+    }
+
+    .stats-list i {
+        color: #007bff;
+        min-width: 16px;
+    }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .property-card-small {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .property-card-small:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .property-image-small {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: #f0f0f0;
+        position: relative;
+    }
+
+    .property-price-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #007bff;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+
+    .property-card-small-body {
+        padding: 1rem;
+    }
+
+    .property-card-small h6 {
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .property-location-small {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+
+    .property-location-small i {
+        color: #007bff;
+        margin-right: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+        .stat-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .stat-item .icon {
+            font-size: 1.2rem;
+        }
+
+        .stat-item .value {
+            font-size: 0.95rem;
+        }
+
+        .section {
+            padding: 1rem;
+        }
+
+        .owner-card {
+            position: static;
+            margin-bottom: 1.5rem;
+        }
+
+        .related-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <!-- Back button -->
+    <a href="{% url 'properties:property_list' %}" class="btn btn-outline-secondary btn-sm mb-3">
+        <i class="fas fa-arrow-left"></i> Back to Listings
+    </a>
+
+    <!-- Property Header -->
+    <div class="property-header">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <h1>{{ property.title }}</h1>
+                <p class="location mb-0">
+                    <i class="fas fa-map-marker-alt"></i> 
+                    {{ property.address }}, {{ property.area }}, {{ property.city }}
+                </p>
+            </div>
+            {% if property.is_featured %}
+                <span class="featured-badge"><i class="fas fa-star"></i> Featured</span>
+            {% endif %}
+        </div>
+        <div class="property-price">₵{{ property.price|floatformat:0 }}/month</div>
+    </div>
+
+    <div class="row g-3">
+        <!-- Main Content (Left) -->
+        <div class="col-lg-8">
+            <!-- Gallery -->
+            <div class="gallery-container">
+                {% if images %}
+                    <img src="{{ images.0.image.url }}" alt="{{ property.title }}" class="main-image" id="mainImage">
+                    {% if images|length > 1 %}
+                        <button class="gallery-nav prev" onclick="prevImage()">&lt;</button>
+                        <button class="gallery-nav next" onclick="nextImage()">&gt;</button>
+                        <div class="gallery-counter">
+                            <span id="currentImageIndex">1</span> / <span id="totalImages">{{ images|length }}</span>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <img src="https://via.placeholder.com/800x450?text=No+Image" alt="{{ property.title }}" class="main-image">
+                {% endif %}
+            </div>
+
+            <!-- Thumbnails -->
+            {% if images %}
+                <div class="thumbnail-row">
+                    {% for image in images %}
+                        <img src="{{ image.image.url }}" alt="Thumbnail" class="thumbnail {% if forloop.first %}active{% endif %}" onclick="changeImage('{{ image.image.url }}', this)">
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Quick Stats -->
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="icon"><i class="fas fa-bed"></i></div>
+                    <div class="value">{{ property.bedrooms }}</div>
+                    <div class="label">Bedrooms</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon"><i class="fas fa-bath"></i></div>
+                    <div class="value">{{ property.bathrooms }}</div>
+                    <div class="label">Bathrooms</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon"><i class="fas fa-ruler-combined"></i></div>
+                    <div class="value">{{ property.size }}m²</div>
+                    <div class="label">Size</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon"><i class="fas fa-couch"></i></div>
+                    <div class="value" style="font-size: 0.9rem; text-transform: capitalize;">{{ property.get_furnishing_display }}</div>
+                    <div class="label">Furnishing</div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="section">
+                <h3><i class="fas fa-file-alt"></i> Description</h3>
+                <p>{{ property.description }}</p>
+            </div>
+
+            <!-- Amenities -->
+            <div class="section">
+                <h3><i class="fas fa-check-circle"></i> Amenities & Features</h3>
+                <div>
+                    {% if property.parking %}<span class="amenity-badge"><i class="fas fa-car"></i> Parking</span>{% endif %}
+                    {% if property.security %}<span class="amenity-badge"><i class="fas fa-shield-alt"></i> Security</span>{% endif %}
+                    {% if property.swimming_pool %}<span class="amenity-badge"><i class="fas fa-swimming-pool"></i> Pool</span>{% endif %}
+                    {% if property.gym %}<span class="amenity-badge"><i class="fas fa-dumbbell"></i> Gym</span>{% endif %}
+                    {% if property.garden %}<span class="amenity-badge"><i class="fas fa-tree"></i> Garden</span>{% endif %}
+                    {% if property.balcony %}<span class="amenity-badge"><i class="fas fa-building"></i> Balcony</span>{% endif %}
+                    {% if property.wifi %}<span class="amenity-badge"><i class="fas fa-wifi"></i> WiFi</span>{% endif %}
+                    {% if property.air_conditioning %}<span class="amenity-badge"><i class="fas fa-wind"></i> AC</span>{% endif %}
+                    {% if not property.parking and not property.security and not property.swimming_pool and not property.gym and not property.garden and not property.balcony and not property.wifi and not property.air_conditioning %}
+                        <p class="text-muted">No amenities specified</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Location Map -->
+            <div class="section">
+                <h3><i class="fas fa-map-marked-alt"></i> Location</h3>
+                <div id="map"></div>
+                <p class="text-muted mt-2 small"><i class="fas fa-info-circle"></i> Exact location shown after inquiry</p>
+            </div>
+
+            <!-- Videos -->
+            {% if videos %}
+                <div class="section">
+                    <h3><i class="fas fa-video"></i> Property Videos</h3>
+                    <div class="row g-2">
+                        {% for video in videos %}
+                            <div class="col-md-6">
+                                <div class="video-container">
+                                    <video controls>
+                                        <source src="{{ video.video.url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Reviews -->
+            <div class="section">
+                <h3><i class="fas fa-star"></i> Reviews</h3>
+                
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div>
+                                    <div class="review-author">{{ review.user.get_full_name_or_username }}</div>
+                                    <div class="review-rating">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="review-comment">{{ review.comment }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No reviews yet. Be the first to review!</p>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <button class="btn btn-outline-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                        <i class="fas fa-plus"></i> Add Review
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar (Right) -->
+        <div class="col-lg-4">
+            <!-- Owner Card -->
+            <div class="owner-card">
+                {% if property.owner.profile_picture %}
+                    <img src="{{ property.owner.profile_picture.url }}" alt="{{ property.owner.username }}" class="owner-avatar">
+                {% else %}
+                    <div class="owner-avatar-placeholder">
+                        {{ property.owner.username.0|upper }}
+                    </div>
+                {% endif %}
+                
+                <div class="owner-name">{{ property.owner.get_full_name_or_username }}</div>
+                {% if property.owner.company_name %}
+                    <div class="owner-company">{{ property.owner.company_name }}</div>
+                {% endif %}
+                {% if property.owner.is_verified %}
+                    <div class="owner-badge">
+                        <i class="fas fa-check-circle"></i> Verified
+                    </div>
+                {% endif %}
+
+                <hr style="border-color: rgba(255, 255, 255, 0.3); margin: 1rem 0;">
+
+                <!-- Contact Buttons -->
+                <div class="owner-buttons">
+                    {% if user.is_authenticated and user == property.owner %}
+                        <a href="{% url 'properties:property_edit' property.slug %}" class="btn">
+                            <i class="fas fa-edit"></i> Edit Property
+                        </a>
+                        <a href="{% url 'accounts:dashboard' %}" class="btn">
+                            <i class="fas fa-arrow-left"></i> My Properties
+                        </a>
+                    {% elif user.is_authenticated and user != property.owner %}
+                        <a href="{% url 'chat:start_chat' property.id %}" class="btn">
+                            <i class="fas fa-comments"></i> Message
+                        </a>
+                        {% if property.owner.whatsapp %}
+                            <a href="https://wa.me/{{ property.owner.whatsapp }}" target="_blank" class="btn btn-success">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        {% endif %}
+                        {% if property.owner.phone %}
+                            <a href="tel:{{ property.owner.phone }}" class="btn btn-phone">
+                                <i class="fas fa-phone"></i> Call
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn">
+                            <i class="fas fa-sign-in-alt"></i> Login to Contact
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Stats Card -->
+            <div class="section">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;"><i class="fas fa-chart-line"></i> Property Stats</h3>
+                <ul class="stats-list">
+                    <li><i class="fas fa-eye"></i> <strong>Views:</strong> {{ property.views }}</li>
+                    <li><i class="fas fa-heart"></i> <strong>Favorites:</strong> {{ property.favorites_count }}</li>
+                    <li><i class="fas fa-calendar"></i> <strong>Posted:</strong> {{ property.created_at|date:"M d, Y" }}</li>
+                    <li><i class="fas fa-tag"></i> <strong>Status:</strong> <span class="badge bg-success">{{ property.get_status_display }}</span></li>
+                </ul>
+            </div>
+
+            <!-- Favorite Button -->
+            {% if user.is_authenticated and user != property.owner %}
+                <form method="post" action="{% url 'properties:toggle_favorite' property.slug %}" class="mb-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger w-100" style="border-width: 2px;">
+                        <i class="fas fa-heart"></i> 
+                        {% if is_favorited %}
+                            <strong>Saved</strong>
+                        {% else %}
+                            Save Property
+                        {% endif %}
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Related Properties -->
+    {% if related_properties %}
+        <div class="mt-5 mb-5">
+            <h3 class="mb-3">
+                <i class="fas fa-home"></i> Similar Properties in {{ property.region }}
+            </h3>
+            <div class="related-grid">
+                {% for prop in related_properties %}
+                    <div class="property-card-small">
+                        <div class="property-image-small" style="position: relative;">
+                            {% if prop.images.first %}
+                                <img src="{{ prop.images.first.image.url }}" alt="{{ prop.title }}" class="property-image-small">
+                            {% else %}
+                                <img src="https://via.placeholder.com/300x200?text=No+Image" alt="{{ prop.title }}" class="property-image-small">
+                            {% endif %}
+                            <div class="property-price-badge">₵{{ prop.price|floatformat:0 }}</div>
+                        </div>
+                        <div class="property-card-small-body">
+                            <h6>{{ prop.title|truncatewords:5 }}</h6>
+                            <div class="property-location-small">
+                                <i class="fas fa-map-marker-alt"></i> {{ prop.city }}, {{ prop.area }}
+                            </div>
+                            <a href="{% url 'properties:property_detail' prop.slug %}" class="btn btn-outline-primary btn-sm w-100">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Review Modal -->
+{% if user.is_authenticated %}
+    <div class="modal fade" id="reviewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" action="{% url 'properties:add_review' property.slug %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            <select name="rating" class="form-select" required>
+                                <option value="">Select rating</option>
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Very Good</option>
+                                <option value="3">3 - Good</option>
+                                <option value="2">2 - Fair</option>
+                                <option value="1">1 - Poor</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comment</label>
+                            <textarea name="comment" class="form-control" rows="4" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+    // Gallery image data
+    const galleryImages = [
+        {% for image in images %}'{{ image.image.url }}'{% if not forloop.last %},{% endif %}{% endfor %}
+    ];
+    let currentImageIndex = 0;
+
+    function changeImage(src, element) {
+        currentImageIndex = galleryImages.indexOf(src);
+        document.getElementById('mainImage').src = src;
+        document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+        element.classList.add('active');
+        updateImageCounter();
+    }
+
+    function nextImage() {
+        if (galleryImages.length > 0) {
+            currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+            document.getElementById('mainImage').src = galleryImages[currentImageIndex];
+            updateThumbnailActive();
+            updateImageCounter();
+        }
+    }
+
+    function prevImage() {
+        if (galleryImages.length > 0) {
+            currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+            document.getElementById('mainImage').src = galleryImages[currentImageIndex];
+            updateThumbnailActive();
+            updateImageCounter();
+        }
+    }
+
+    function updateThumbnailActive() {
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails.forEach((thumb, idx) => {
+            if (idx === currentImageIndex) {
+                thumb.classList.add('active');
+            } else {
+                thumb.classList.remove('active');
+            }
+        });
+    }
+
+    function updateImageCounter() {
+        const counter = document.getElementById('currentImageIndex');
+        if (counter) {
+            counter.textContent = currentImageIndex + 1;
+        }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight') nextImage();
+        if (e.key === 'ArrowLeft') prevImage();
+    });
+
+    function initMap() {
+        // Region coordinates for Ghana
+        const regionCoordinates = {
+            'greater-accra': [5.6037, -0.1870],
+            'ashanti': [6.7275, -1.5833],
+            'western': [5.6000, -2.5000],
+            'eastern': [6.2000, -0.8000],
+            'central': [5.2000, -1.2500],
+            'northern': [9.5000, -0.8000],
+            'upper-east': [10.7500, -1.0000],
+            'upper-west': [10.3000, -2.5000],
+            'volta': [6.5000, 0.5000],
+            'bono': [7.7500, -2.0000],
+            'bono-east': [7.3000, -0.5000],
+            'ahafo': [6.5000, -2.5000],
+            'savannah': [9.0000, -1.5000],
+            'north-east': [10.5000, 0.5000],
+            'oti': [9.0000, 1.0000],
+            'western-north': [8.0000, -3.0000]
+        };
+        
+        // Get property coordinates or use region as fallback
+        let lat = {{ property.latitude|default:"null" }};
+        let lng = {{ property.longitude|default:"null" }};
+        
+        if (lat === null || lng === null) {
+            const region = '{{ property.region }}';
+            const coords = regionCoordinates[region] || [5.6037, -0.1870];
+            lat = coords[0];
+            lng = coords[1];
+        }
+        
+        const propertyLocation = [lat, lng];
+        
+        const map = L.map('map').setView(propertyLocation, 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        L.marker(propertyLocation).addTo(map)
+            .bindPopup('<strong>{{ property.title }}</strong><br>{{ property.address }}')
+            .openPopup();
+    }
+    
+    document.addEventListener('DOMContentLoaded', initMap);
+</script>
+{% endblock %}

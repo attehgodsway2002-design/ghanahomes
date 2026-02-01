@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .error-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        .error-code {
+            font-size: 80px;
+            font-weight: bold;
+            color: #fa709a;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+        .error-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .error-message {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .error-details {
+            background: #f8f9fa;
+            border-left: 4px solid #fa709a;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: left;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+        .error-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #fa709a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #e6526d;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+        .footer-text {
+            font-size: 13px;
+            color: #999;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <div class="error-title">Page Not Found</div>
+        <div class="error-message">{{ message }}</div>
+        
+        {% if exception and DEBUG %}
+            <div class="error-details">
+                <strong>Debug Info:</strong><br>
+                {{ exception }}
+            </div>
+        {% endif %}
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">Go Home</a>
+            <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
+        </div>
+        <div class="footer-text">
+            If you're looking for something specific, try using our <a href="/search" style="color: #fa709a;">search feature</a>
+        </div>
+    </div>
+</body>
+</html>

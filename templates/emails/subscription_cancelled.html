@@ -1,0 +1,65 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #6c757d; margin-bottom: 20px;">Subscription Cancelled</h2>
+        
+        <p>Hello {{ user.first_name|default:user.username }},</p>
+        
+        <p>Your GhanaHomes subscription has been successfully cancelled. Here are the details of your cancellation:</p>
+        
+        <div style="background-color: #e2e3e5; border-left: 4px solid #6c757d; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #383d41;">
+                <strong>✓ Status:</strong> Cancelled
+            </p>
+            <p style="margin: 10px 0 0 0; color: #383d41;">
+                <strong>Cancelled On:</strong> {{ cancellation_date|date:"F j, Y, g:i a" }}
+            </p>
+        </div>
+        
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Plan Cancelled:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">{{ subscription.plan.name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Start Date:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">{{ subscription.start_date|date:"F j, Y" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>End Date:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">{{ subscription.end_date|date:"F j, Y" }}</td>
+            </tr>
+        </table>
+        
+        <h3 style="color: #333; margin-top: 25px;">What Happens Now?</h3>
+        <ul style="color: #666;">
+            <li>Your property listings will be deactivated immediately</li>
+            <li>You won't receive new inquiries or messages from tenants</li>
+            <li>Your account and all data will be retained for 30 days</li>
+            <li>You can reactivate by subscribing to any plan at any time</li>
+        </ul>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="margin: 0; color: #666; font-size: 13px;">
+                <strong>Feedback:</strong> We'd love to hear why you cancelled. Your feedback helps us improve our service. You can reply to this email with any comments.
+            </p>
+        </div>
+        
+        <h3 style="color: #333; margin-top: 25px;">Want to Reactivate?</h3>
+        <p style="color: #666;">
+            If you change your mind, you can reactivate your subscription anytime. Your listings and account data are safe.
+        </p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ plans_url }}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                View Subscription Plans
+            </a>
+        </div>
+        
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

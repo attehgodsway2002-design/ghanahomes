@@ -1,0 +1,274 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Verification Requests - Admin{% endblock %}
+
+{% block extrahead %}
+<style>
+    .verification-dashboard {
+        padding: 20px;
+    }
+    
+    .status-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #ddd;
+    }
+    
+    .status-tab {
+        padding: 12px 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        color: #666;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .status-tab.active {
+        color: #FF6B35;
+        border-bottom-color: #FF6B35;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+    
+    .badge-pending {
+        background-color: #FEE3D5;
+        color: #C2410C;
+    }
+    
+    .badge-approved {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .badge-declined {
+        background-color: #FEE2E2;
+        color: #7F1D1D;
+    }
+    
+    .request-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .request-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .request-info {
+        flex: 1;
+    }
+    
+    .request-user {
+        font-weight: 600;
+        font-size: 16px;
+        color: #111;
+    }
+    
+    .request-meta {
+        font-size: 14px;
+        color: #666;
+        margin-top: 4px;
+    }
+    
+    .request-date {
+        color: #999;
+        font-size: 13px;
+    }
+    
+    .request-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .btn-view {
+        padding: 8px 16px;
+        background-color: #3B82F6;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .btn-view:hover {
+        background-color: #2563EB;
+    }
+    
+    .search-box {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .search-box input {
+        flex: 1;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    
+    .search-box button {
+        padding: 10px 20px;
+        background-color: #FF6B35;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+    
+    .search-box button:hover {
+        background-color: #E55A2B;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+    
+    .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 32px;
+        font-weight: 700;
+        color: #111;
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        color: #666;
+        margin-top: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verification-dashboard">
+    <h1>Verification Requests</h1>
+    <p style="color: #666; margin-top: 8px;">Review and manage user account verification requests</p>
+    
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ pending_count }}</div>
+            <div class="stat-label">Pending Review</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ approved_count }}</div>
+            <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ declined_count }}</div>
+            <div class="stat-label">Declined</div>
+        </div>
+    </div>
+    
+    <!-- Search -->
+    <div class="search-box">
+        <form method="get" style="display: flex; gap: 10px; flex: 1;">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Search by username, email, company, or license number..." 
+                value="{{ search_query }}"
+                style="flex: 1;"
+            >
+            <button type="submit">Search</button>
+            {% if search_query %}
+            <a href="?status={{ current_status }}" style="padding: 10px 20px; background: #999; color: white; border-radius: 4px; text-decoration: none; border: none; cursor: pointer;">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+    
+    <!-- Status Tabs -->
+    <div class="status-tabs">
+        <a href="?status=all" class="status-tab {% if current_status == 'all' %}active{% endif %}">
+            All Requests
+        </a>
+        <a href="?status=pending" class="status-tab {% if current_status == 'pending' %}active{% endif %}">
+            Pending <span class="status-badge badge-pending">{{ pending_count }}</span>
+        </a>
+        <a href="?status=approved" class="status-tab {% if current_status == 'approved' %}active{% endif %}">
+            Approved <span class="status-badge badge-approved">{{ approved_count }}</span>
+        </a>
+        <a href="?status=declined" class="status-tab {% if current_status == 'declined' %}active{% endif %}">
+            Declined <span class="status-badge badge-declined">{{ declined_count }}</span>
+        </a>
+    </div>
+    
+    <!-- Requests List -->
+    {% if verification_requests %}
+        {% for request in verification_requests %}
+        <div class="request-card">
+            <div class="request-info">
+                <div class="request-user">
+                    {{ request.user.get_full_name|default:request.user.username }}
+                    <span class="status-badge badge-{{ request.status }}">{{ request.get_status_display }}</span>
+                </div>
+                <div class="request-meta">
+                    <strong>Email:</strong> {{ request.user.email }}<br>
+                    <strong>Company:</strong> {{ request.user.company_name|default:"N/A" }}<br>
+                    <strong>License:</strong> {{ request.license_number }}
+                </div>
+                <div class="request-date">
+                    Submitted: {{ request.created_at|date:"M d, Y H:i" }}
+                    {% if request.reviewed_at %}
+                    | Reviewed by {{ request.reviewed_by.username }} on {{ request.reviewed_at|date:"M d, Y H:i" }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="request-actions">
+                <a href="{% url 'accounts:verification_detail' request.pk %}" class="btn-view">Review</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h2>No verification requests</h2>
+            <p>There are no {{ current_status }} verification requests at the moment.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

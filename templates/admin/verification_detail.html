@@ -1,0 +1,431 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Verification Request Detail - Admin{% endblock %}
+
+{% block extrahead %}
+<style>
+    .verification-detail {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .detail-header {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+    }
+    
+    .header-info h1 {
+        margin: 0 0 8px 0;
+        font-size: 24px;
+    }
+    
+    .header-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .badge-pending {
+        background-color: #FEE3D5;
+        color: #C2410C;
+    }
+    
+    .badge-approved {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .badge-declined {
+        background-color: #FEE2E2;
+        color: #7F1D1D;
+    }
+    
+    .detail-section {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 16px 0;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f3f4f6;
+    }
+    
+    .detail-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 16px;
+    }
+    
+    .detail-field {
+        flex: 1;
+    }
+    
+    .field-label {
+        font-size: 12px;
+        color: #666;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    
+    .field-value {
+        font-size: 16px;
+        color: #111;
+    }
+    
+    .document-preview {
+        margin-top: 16px;
+        padding: 16px;
+        background-color: #f9fafb;
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .document-link {
+        color: #3B82F6;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .document-link:hover {
+        text-decoration: underline;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+    
+    .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-approve {
+        background-color: #10B981;
+        color: white;
+    }
+    
+    .btn-approve:hover {
+        background-color: #059669;
+    }
+    
+    .btn-decline {
+        background-color: #EF4444;
+        color: white;
+    }
+    
+    .btn-decline:hover {
+        background-color: #DC2626;
+    }
+    
+    .btn-back {
+        background-color: #6B7280;
+        color: white;
+    }
+    
+    .btn-back:hover {
+        background-color: #4B5563;
+    }
+    
+    .decline-form {
+        margin-top: 20px;
+        padding: 16px;
+        background-color: #FEF3C7;
+        border: 1px solid #FCD34D;
+        border-radius: 8px;
+        display: none;
+    }
+    
+    .decline-form.active {
+        display: block;
+    }
+    
+    .decline-form textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-bottom: 12px;
+        min-height: 100px;
+        font-family: inherit;
+    }
+    
+    .decline-form-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .decline-form button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    .decline-submit {
+        background-color: #EF4444;
+        color: white;
+    }
+    
+    .decline-submit:hover {
+        background-color: #DC2626;
+    }
+    
+    .decline-cancel {
+        background-color: #6B7280;
+        color: white;
+    }
+    
+    .decline-cancel:hover {
+        background-color: #4B5563;
+    }
+    
+    .user-card {
+        display: flex;
+        gap: 16px;
+        align-items: start;
+    }
+    
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    
+    .user-details {
+        flex: 1;
+    }
+    
+    .username {
+        font-size: 18px;
+        font-weight: 700;
+        color: #111;
+    }
+    
+    .user-type {
+        font-size: 13px;
+        color: #666;
+        margin-top: 4px;
+    }
+    
+    .back-link {
+        color: #3B82F6;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verification-detail">
+    <a href="{% url 'accounts:verification_dashboard' %}" class="back-link">← Back to Verification Requests</a>
+    
+    <!-- Header -->
+    <div class="detail-header">
+        <div class="header-info">
+            <h1>Verification Request Review</h1>
+            <p style="color: #666; margin: 8px 0 0 0;">Request ID: #{{ verification_request.id }}</p>
+        </div>
+        <div class="header-status">
+            <span class="status-badge badge-{{ verification_request.status }}">
+                {{ verification_request.get_status_display }}
+            </span>
+        </div>
+    </div>
+    
+    <!-- User Information -->
+    <div class="detail-section">
+        <div class="section-title">User Information</div>
+        <div class="user-card">
+            <div class="user-avatar">{{ verification_request.user.get_full_name|first|upper }}</div>
+            <div class="user-details">
+                <div class="username">{{ verification_request.user.get_full_name|default:verification_request.user.username }}</div>
+                <div class="user-type">{{ verification_request.user.get_user_type_display }}</div>
+                
+                <div class="detail-row" style="margin-top: 16px;">
+                    <div class="detail-field">
+                        <div class="field-label">Email</div>
+                        <div class="field-value">
+                            <a href="mailto:{{ verification_request.user.email }}" style="color: #3B82F6;">
+                                {{ verification_request.user.email }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="detail-field">
+                        <div class="field-label">Phone</div>
+                        <div class="field-value">{{ verification_request.user.phone|default:"Not provided" }}</div>
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-field">
+                        <div class="field-label">Company</div>
+                        <div class="field-value">{{ verification_request.user.company_name|default:"Not provided" }}</div>
+                    </div>
+                    <div class="detail-field">
+                        <div class="field-label">Member Since</div>
+                        <div class="field-value">{{ verification_request.user.date_joined|date:"M d, Y" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Verification Details -->
+    <div class="detail-section">
+        <div class="section-title">Verification Submission</div>
+        
+        <div class="detail-row">
+            <div class="detail-field">
+                <div class="field-label">License Number</div>
+                <div class="field-value">{{ verification_request.license_number }}</div>
+            </div>
+            <div class="detail-field">
+                <div class="field-label">Submitted</div>
+                <div class="field-value">{{ verification_request.created_at|date:"M d, Y H:i" }}</div>
+            </div>
+        </div>
+        
+        <div class="document-preview">
+            <div style="margin-bottom: 12px;">📄 Verification Document</div>
+            <a href="{{ verification_request.verification_document.url }}" class="document-link" target="_blank">
+                Download Document
+            </a>
+            {% if verification_request.verification_document %}
+                <p style="font-size: 12px; color: #666; margin-top: 8px;">
+                    File: {{ verification_request.verification_document.name }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Review Information (if already reviewed) -->
+    {% if verification_request.reviewed_at %}
+    <div class="detail-section">
+        <div class="section-title">Review Information</div>
+        
+        <div class="detail-row">
+            <div class="detail-field">
+                <div class="field-label">Reviewed By</div>
+                <div class="field-value">{{ verification_request.reviewed_by.get_full_name|default:verification_request.reviewed_by.username }}</div>
+            </div>
+            <div class="detail-field">
+                <div class="field-label">Reviewed On</div>
+                <div class="field-value">{{ verification_request.reviewed_at|date:"M d, Y H:i" }}</div>
+            </div>
+        </div>
+        
+        {% if verification_request.decline_reason %}
+        <div class="detail-field">
+            <div class="field-label">Decline Reason</div>
+            <div class="field-value">{{ verification_request.decline_reason }}</div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Actions -->
+    {% if verification_request.status == 'pending' %}
+    <div class="detail-section">
+        <div class="section-title">Action</div>
+        <p style="color: #666; margin-bottom: 16px;">Choose to approve or decline this verification request.</p>
+        
+        <div class="action-buttons">
+            <form method="post" style="margin: 0;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="approve">
+                <button type="submit" class="btn btn-approve">✓ Approve Verification</button>
+            </form>
+            <button onclick="toggleDeclineForm()" class="btn btn-decline">✗ Decline Verification</button>
+            <a href="{% url 'accounts:verification_dashboard' %}" class="btn btn-back">Cancel</a>
+        </div>
+        
+        <!-- Decline Form -->
+        <div class="decline-form" id="declineForm">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="decline">
+                <div style="margin-bottom: 12px;">
+                    <label style="font-weight: 600; display: block; margin-bottom: 8px;">Reason for Declining (Required)</label>
+                    <textarea name="decline_reason" placeholder="Please provide a clear reason for declining this verification request..." required></textarea>
+                </div>
+                <div class="decline-form-buttons">
+                    <button type="submit" class="decline-submit">Submit Decline</button>
+                    <button type="button" onclick="toggleDeclineForm()" class="decline-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+        {% if verification_request.status == 'approved' %}
+        <div class="detail-section" style="background-color: #D1FAE5; border-color: #10B981;">
+            <div class="section-title" style="border-color: #10B981; color: #065F46;">✓ This request has been approved</div>
+            <p>User's account was verified on {{ verification_request.reviewed_at|date:"M d, Y H:i" }} by {{ verification_request.reviewed_by.username }}</p>
+            <a href="{% url 'accounts:verification_dashboard' %}" class="btn btn-back">Back to Requests</a>
+        </div>
+        {% elif verification_request.status == 'declined' %}
+        <div class="detail-section" style="background-color: #FEE2E2; border-color: #EF4444;">
+            <div class="section-title" style="border-color: #EF4444; color: #7F1D1D;">✗ This request has been declined</div>
+            <p><strong>Reason:</strong> {{ verification_request.decline_reason }}</p>
+            <p><strong>Declined by:</strong> {{ verification_request.reviewed_by.username }} on {{ verification_request.reviewed_at|date:"M d, Y H:i" }}</p>
+            <a href="{% url 'accounts:verification_dashboard' %}" class="btn btn-back">Back to Requests</a>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<script>
+    function toggleDeclineForm() {
+        const form = document.getElementById('declineForm');
+        form.classList.toggle('active');
+    }
+</script>
+{% endblock %}

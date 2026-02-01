@@ -1,0 +1,38 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #EF4444; text-align: center; margin-bottom: 24px;">✗ Verification Declined</h2>
+    
+    <p>A verification request has been declined by an admin.</p>
+    
+    <div style="background-color: #FEE2E2; border-left: 4px solid #EF4444; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <h4 style="margin-top: 0; color: #7F1D1D;">Details</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="border-bottom: 1px solid #FECACA;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666; width: 40%;">User:</td>
+                <td style="padding: 8px 0;">{{ user.get_full_name|default:user.username }}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #FECACA;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Company:</td>
+                <td style="padding: 8px 0;">{{ user.company_name|default:"N/A" }}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #FECACA;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Declined By:</td>
+                <td style="padding: 8px 0;">{{ declined_by }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Declined At:</td>
+                <td style="padding: 8px 0;">{{ declined_at }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div style="background-color: #fff3cd; border-left: 4px solid #F59E0B; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <h4 style="margin-top: 0; color: #92400E;">Reason for Decline</h4>
+        <p style="margin: 0; color: #666; white-space: pre-wrap;">{{ decline_reason }}</p>
+    </div>
+    
+    <p style="color: #666;">User has been notified and can resubmit with corrected information.</p>
+</div>
+{% endblock %}

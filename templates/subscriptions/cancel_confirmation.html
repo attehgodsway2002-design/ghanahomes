@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Subscription - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Cancel Subscription</h4>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">
+                        <strong>Are you sure you want to cancel your subscription?</strong>
+                    </p>
+                    
+                    <div class="alert alert-warning mb-4">
+                        <h6>What happens when you cancel:</h6>
+                        <ul class="mb-0">
+                            <li>Your current plan will remain active until <strong>{{ subscription.end_date|date:"M d, Y" }}</strong></li>
+                            <li>After expiration, you'll lose access to premium features</li>
+                            <li>Your properties will remain visible but you won't be able to post new ones</li>
+                            <li>You can reactivate your subscription anytime</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="text-muted mb-4">
+                        Current plan: <strong>{{ subscription.plan.name }}</strong><br>
+                        Expires on: <strong>{{ subscription.end_date|date:"M d, Y H:i" }}</strong>
+                    </p>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'subscriptions:my_subscription' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Keep My Subscription
+                        </a>
+                        <a href="?confirm=yes" class="btn btn-danger">
+                            <i class="fas fa-times"></i> Yes, Cancel Subscription
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

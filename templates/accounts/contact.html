@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="contact-header text-center mb-5">
+        <h1 class="display-5 fw-bold mb-3">Get In Touch</h1>
+        <p class="lead text-muted">We're here to help. Reach out to us with any questions or concerns.</p>
+    </div>
+
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Contact Information Cards -->
+    <div class="row g-4 mb-5">
+        <!-- Location Card -->
+        <div class="col-md-4">
+            <div class="contact-info-card h-100 shadow-sm border-0 p-4 text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
+                <div class="mb-4">
+                    <i class="fas fa-map-marker-alt" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-3">Location</h5>
+                <p class="mb-0">{{ support_location }}</p>
+            </div>
+        </div>
+
+        <!-- Phone Card -->
+        <div class="col-md-4">
+            <div class="contact-info-card h-100 shadow-sm border-0 p-4 text-center" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+                <div class="mb-4">
+                    <i class="fas fa-phone" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-3">Phone</h5>
+                <a href="tel:+233556067555" class="text-white text-decoration-none fw-bold">{{ support_phone }}</a>
+            </div>
+        </div>
+
+        <!-- Email Card -->
+        <div class="col-md-4">
+            <div class="contact-info-card h-100 shadow-sm border-0 p-4 text-center" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+                <div class="mb-4">
+                    <i class="fas fa-envelope" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-3">Email</h5>
+                <a href="mailto:{{ support_email }}" class="text-white text-decoration-none fw-bold">{{ support_email }}</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Contact Form Card -->
+            <div class="card shadow-sm border-0 contact-form-card mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, #FF6B35 0%, #ff5a20 100%); border: none;">
+                    <h5 class="mb-0 text-white fw-bold">
+                        <i class="fas fa-pen-fancy"></i> Send Us a Message
+                    </h5>
+                </div>
+                <div class="card-body p-5">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Name Field -->
+                        <div class="mb-4">
+                            <label for="name" class="form-label fw-bold mb-2">Full Name *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="fas fa-user text-primary"></i>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    class="form-control border-start-0" 
+                                    id="name" 
+                                    name="name" 
+                                    required
+                                    placeholder="Your Full Name"
+                                    maxlength="100"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-bold mb-2">Email Address *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="fas fa-at text-primary"></i>
+                                </span>
+                                <input 
+                                    type="email" 
+                                    class="form-control border-start-0" 
+                                    id="email" 
+                                    name="email" 
+                                    required
+                                    placeholder="your@email.com"
+                                    maxlength="100"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Phone Field -->
+                        <div class="mb-4">
+                            <label for="phone" class="form-label fw-bold mb-2">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="fas fa-phone text-primary"></i>
+                                </span>
+                                <input 
+                                    type="tel" 
+                                    class="form-control border-start-0" 
+                                    id="phone" 
+                                    name="phone" 
+                                    placeholder="+233XXXXXXXXX"
+                                    maxlength="20"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Subject Field -->
+                        <div class="mb-4">
+                            <label for="subject" class="form-label fw-bold mb-2">Subject *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="fas fa-lightbulb text-primary"></i>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    class="form-control border-start-0" 
+                                    id="subject" 
+                                    name="subject" 
+                                    required
+                                    placeholder="How can we help?"
+                                    maxlength="200"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Message Field -->
+                        <div class="mb-4">
+                            <label for="message" class="form-label fw-bold mb-2">Message *</label>
+                            <textarea 
+                                class="form-control form-control-lg" 
+                                id="message" 
+                                name="message" 
+                                rows="6" 
+                                required
+                                placeholder="Please describe your inquiry in detail..."
+                                maxlength="2000"
+                                style="border-radius: 8px; border: 2px solid #e0e0e0; resize: none;"
+                            ></textarea>
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i> Maximum 2000 characters
+                            </small>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 mb-3">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Response Time Info Box -->
+            <div class="info-box mt-4 p-4 rounded" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-left: 5px solid #FF6B35;">
+                <div class="d-flex">
+                    <div class="me-3">
+                        <i class="fas fa-clock" style="font-size: 1.5rem; color: #FF6B35;"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: #333;">Expected Response Time</h6>
+                        <p class="mb-0 text-muted small">
+                            We aim to respond to all inquiries within <strong>24 business hours</strong>. 
+                            For urgent matters, please call us directly at <strong>{{ support_phone }}</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back Link -->
+            <div class="text-center mt-5">
+                <a href="{% url 'properties:home' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Header Section */
+    .contact-header {
+        animation: slideInDown 0.6s ease;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Contact Info Cards */
+    .contact-info-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .contact-info-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.2) !important;
+    }
+
+    .contact-info-card i {
+        transition: all 0.3s ease;
+    }
+
+    .contact-info-card:hover i {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    /* Form Card */
+    .contact-form-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .contact-form-card:hover {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+
+    .card-header {
+        border-radius: 12px 12px 0 0;
+    }
+
+    /* Form Controls */
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus {
+        border-color: #FF6B35;
+        box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.15);
+        background-color: #fff;
+    }
+
+    .form-control-lg {
+        font-size: 1rem;
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa !important;
+        border: 2px solid #e0e0e0;
+        border-right: none;
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
+    .input-group .form-control:focus {
+        border-color: #FF6B35;
+        border-left-color: #FF6B35;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #FF6B35 0%, #ff5a20 100%);
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-outline-primary {
+        color: #FF6B35;
+        border: 2px solid #FF6B35;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #FF6B35;
+        border-color: #FF6B35;
+    }
+
+    /* Info Box */
+    .info-box {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .info-box:hover {
+        transform: translateX(5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .display-5 {
+            font-size: 1.8rem;
+        }
+
+        .lead {
+            font-size: 0.95rem;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+        }
+
+        .form-control,
+        .form-control:focus,
+        .btn {
+            font-size: 16px;
+            min-height: 44px;
+            padding: 0.75rem;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1rem !important;
+            font-size: 16px;
+        }
+
+        .contact-info-card {
+            padding: 1.5rem !important;
+        }
+
+        .info-box {
+            padding: 1.25rem !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .col-lg-8 {
+            padding: 0 !important;
+        }
+
+        .display-5 {
+            font-size: 1.5rem;
+        }
+
+        .lead {
+            font-size: 0.9rem;
+        }
+
+        .card-body,
+        .contact-info-card,
+        .info-box {
+            padding: 1rem !important;
+        }
+
+        .contact-info-card i {
+            font-size: 2rem !important;
+        }
+
+        .form-control {
+            padding: 0.6rem 0.75rem;
+        }
+
+        .btn-lg {
+            padding: 0.6rem 0.75rem !important;
+        }
+
+        h5 {
+            font-size: 0.95rem;
+        }
+    }
+</style>
+{% endblock %}

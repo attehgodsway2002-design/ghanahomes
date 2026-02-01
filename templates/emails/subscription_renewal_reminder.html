@@ -1,0 +1,60 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #ffc107; margin-bottom: 20px;">📢 Your Subscription Expires Soon</h2>
+        
+        <p>Hello {{ user.first_name|default:user.username }},</p>
+        
+        <p>This is a reminder that your GhanaHomes subscription is expiring soon. Once your subscription expires, you won't be able to access premium features.</p>
+        
+        <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #856404;">
+                <strong>⏰ Expiration Date:</strong> {{ subscription.end_date|date:"F j, Y" }}
+            </p>
+            <p style="margin: 10px 0 0 0; color: #856404;">
+                <strong>Current Plan:</strong> {{ subscription.plan.name }}
+            </p>
+        </div>
+        
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Days Remaining:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;"><strong style="font-size: 18px; color: #ffc107;">{{ days_remaining }}</strong></td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Plan Price:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₵{{ subscription.plan.price }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Billing Cycle:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">{{ subscription.duration|title }}</td>
+            </tr>
+        </table>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ renewal_url }}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                Renew Your Subscription
+            </a>
+        </div>
+        
+        <h3 style="color: #333; margin-top: 25px;">Why Renew?</h3>
+        <ul style="color: #666;">
+            <li>Continue posting and managing your properties</li>
+            <li>Keep receiving tenant inquiries and messages</li>
+            <li>Maintain your listings and reputation</li>
+            <li>Enjoy uninterrupted access to premium features</li>
+        </ul>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="margin: 0; color: #666; font-size: 13px;">
+                <strong>Note:</strong> Your subscription will be automatically cancelled on {{ subscription.end_date|date:"F j, Y" }} if you don't renew. Don't lose your active listings!
+            </p>
+        </div>
+        
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

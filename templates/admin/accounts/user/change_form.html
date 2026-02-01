@@ -1,0 +1,50 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .aligned label {
+        width: 160px;
+    }
+    .aligned .help {
+        margin-left: 165px !important;
+    }
+    .aligned input.vTextField,
+    .aligned input.vURLField,
+    .aligned textarea {
+        width: 25em;
+    }
+    .collapse {
+        padding: 1em;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        margin-bottom: 1em;
+    }
+    .collapse h2 {
+        margin-top: 0;
+    }
+</style>
+{% endblock %}
+
+{% block after_field_sets %}
+{{ block.super }}
+<script>
+    // Add custom JavaScript for form enhancements
+    django.jQuery(document).ready(function($) {
+        // Show/hide business fields based on user type
+        function toggleBusinessFields() {
+            var userType = $('#id_user_type').val();
+            var businessFieldset = $('.field-company_name').closest('fieldset');
+            if (userType === 'landlord') {
+                businessFieldset.show();
+            } else {
+                businessFieldset.hide();
+            }
+        }
+
+        $('#id_user_type').on('change', toggleBusinessFields);
+        toggleBusinessFields();
+    });
+</script>
+{% endblock %}

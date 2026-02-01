@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Server Error</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .error-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        .error-code {
+            font-size: 80px;
+            font-weight: bold;
+            color: #eb3349;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+        .error-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .error-message {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .error-details {
+            background: #f8f9fa;
+            border-left: 4px solid #eb3349;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: left;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .error-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #eb3349;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #c71d38;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+        .footer-text {
+            font-size: 13px;
+            color: #999;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">500</div>
+        <div class="error-title">Server Error</div>
+        <div class="error-message">{{ message }}</div>
+        
+        {% if exception and DEBUG %}
+            <div class="error-details">
+                <strong>Debug Info:</strong><br>
+                {{ exception }}
+            </div>
+        {% endif %}
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">Go Home</a>
+            <a href="/contact" class="btn btn-secondary">Report Issue</a>
+        </div>
+        <div class="footer-text">
+            Our team has been notified of this error. Please try again later.
+        </div>
+    </div>
+</body>
+</html>

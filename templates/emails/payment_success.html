@@ -1,0 +1,66 @@
+{% extends 'emails/base_email.html' %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #28a745; margin-bottom: 20px;">Payment Successful!</h2>
+        
+        <p>Hello {{ payment.user.get_full_name|default:payment.user.username }},</p>
+        
+        <p>Your payment has been successfully processed. Here are your transaction details:</p>
+        
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Amount Paid:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">₵{{ payment.amount }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Reference:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.paystack_reference }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Date:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.updated_at|date:"F j, Y, g:i a" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Payment Method:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.payment_method|default:"Card"|title }}</td>
+            </tr>
+        </table>
+
+        <h3 style="color: #0d6efd; margin: 20px 0;">Subscription Details</h3>
+        
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Plan:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.subscription.plan.name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Duration:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.subscription.duration|title }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Start Date:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.subscription.start_date|date:"F j, Y" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>End Date:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.subscription.end_date|date:"F j, Y" }}</td>
+            </tr>
+        </table>
+
+        <div style="margin: 30px 0;">
+            <a href="{{ site_url }}{% url 'subscriptions:my_subscription' %}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                View My Subscription
+            </a>
+        </div>
+
+        <p>Your subscription is now active, and you can start listing properties on GhanaHomes.</p>
+        
+        <p>If you have any questions about your payment or subscription, please don't hesitate to contact our support team.</p>
+
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

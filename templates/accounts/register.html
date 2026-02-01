@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - GhanaHomes{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background: linear-gradient(135deg, rgba(0,78,137,0.05), rgba(255,107,53,0.05));">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                            <h2 class="mb-2">Create Account</h2>
+                            <p class="text-muted">Join GhanaHomes today</p>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-user"></i> Username *</label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-envelope"></i> Email *</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-user-tag"></i> I am a *</label>
+                                {{ form.user_type }}
+                                <small class="form-text text-muted">
+                                    Choose "Tenant" if you're looking for property, "Landlord/Agent" if you want to list properties
+                                </small>
+                                {% if form.user_type.errors %}
+                                <div class="text-danger small">{{ form.user_type.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                <div class="text-danger small">{{ form.phone.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-lock"></i> Password *</label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                <div class="text-danger small">{{ form.password1.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label"><i class="fas fa-lock"></i> Confirm Password *</label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                <div class="text-danger small">{{ form.password2.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 btn-lg mb-3">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+
+                            <div class="text-center">
+                                <p class="mb-0">Already have an account? 
+                                    <a href="{% url 'accounts:login' %}" class="text-primary fw-bold">Login here</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

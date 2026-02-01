@@ -1,0 +1,75 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="color: #28a745; margin-top: 0;">✓ Payment Successful - Start Posting Properties!</h2>
+<p>Hello {{ user.first_name|default:user.username }},</p>
+<p>Your subscription payment has been received and processed successfully! You can now start posting properties on GhanaHomes.</p>
+
+<div style="background-color: #d4edda; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0; border-radius: 3px;">
+    <p style="margin: 0; color: #155724; font-size: 14px;">
+        <strong>✓ Payment Confirmed:</strong>
+    </p>
+    <p style="margin: 10px 0 0 0; color: #155724; font-size: 14px;">
+        <strong>Reference:</strong> {{ reference_code }}<br>
+        <strong>Amount:</strong> ₵{{ amount }}<br>
+        <strong>Date:</strong> {{ payment_date|date:"M d, Y H:i" }}<br>
+        <strong>Plan:</strong> {{ plan_name }}
+    </p>
+</div>
+
+<h3 style="color: #333; margin-top: 25px;">Your Property Posting Limits:</h3>
+<div style="background-color: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 3px;">
+    <table style="width: 100%; color: #666; font-size: 14px;">
+        <tr>
+            <td style="padding: 8px;"><strong>📍 Properties You Can Post:</strong></td>
+            <td style="padding: 8px; text-align: right;"><strong style="font-size: 18px; color: #FFA500;">{{ properties_limit }}</strong></td>
+        </tr>
+        <tr style="border-top: 1px solid #ddd;">
+            <td style="padding: 8px;"><strong>📊 Currently Posted:</strong></td>
+            <td style="padding: 8px; text-align: right;"><strong style="font-size: 18px; color: #333;">{{ properties_posted }}/{{ properties_limit }}</strong></td>
+        </tr>
+        <tr style="border-top: 1px solid #ddd;">
+            <td style="padding: 8px;"><strong>✏️ Remaining:</strong></td>
+            <td style="padding: 8px; text-align: right;"><strong style="font-size: 18px; color: #28a745;">{{ properties_remaining }}</strong></td>
+        </tr>
+    </table>
+</div>
+
+<h3 style="color: #333; margin-top: 25px;">Next Steps:</h3>
+<ol style="color: #666; font-size: 14px;">
+    <li><strong>Complete Your Profile</strong> - Add your business details and photo</li>
+    <li><strong>Go to Dashboard</strong> - Access your landlord dashboard</li>
+    <li><strong>Create Your First Property</strong> - Add property details, images, and pricing</li>
+    <li><strong>Get Inquiries</strong> - Start receiving messages from interested tenants</li>
+    <li><strong>Chat & Negotiate</strong> - Connect directly with potential renters</li>
+</ol>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{ post_property_url }}" style="background-color: #FFA500; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Post Your First Property</a>
+</div>
+
+<div style="background-color: #e8f4f8; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 3px;">
+    <p style="margin: 0; color: #0c5460; font-size: 14px;">
+        <strong>💡 Pro Tips for Success:</strong>
+    </p>
+    <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #0c5460; font-size: 14px;">
+        <li>Add clear, high-quality photos (at least 5-8 images)</li>
+        <li>Write detailed property descriptions</li>
+        <li>Include all amenities to attract qualified tenants</li>
+        <li>Set competitive pricing based on market rates</li>
+        <li>Respond quickly to tenant inquiries</li>
+    </ul>
+</div>
+
+<div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 3px;">
+    <p style="margin: 0; color: #856404; font-size: 14px;">
+        <strong>🔄 Need More Properties?</strong> When you've posted {{ properties_limit }} properties and want to add more, you can upgrade your subscription plan anytime.
+    </p>
+</div>
+
+<p style="color: #666; font-size: 14px; margin-top: 20px;">
+    <strong>Questions?</strong> Check our <a href="#" style="color: #FFA500; text-decoration: none;">Landlord FAQ</a> or <a href="#" style="color: #FFA500; text-decoration: none;">contact support</a>.
+</p>
+
+<p>Happy posting!<br><strong>The GhanaHomes Team</strong></p>
+{% endblock %}

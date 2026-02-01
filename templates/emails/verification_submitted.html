@@ -1,0 +1,49 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #3B82F6; text-align: center; margin-bottom: 24px;">Verification Request Received</h2>
+    
+    <p>Hi {{ user.get_full_name|default:user.username }},</p>
+    
+    <p>Thank you for submitting your account verification request! We've received your documents and will review them shortly.</p>
+    
+    <div style="background-color: #EFF6FF; border-left: 4px solid #3B82F6; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <h4 style="margin-top: 0; color: #1E40AF;">What Happens Next?</h4>
+        <ul style="margin: 8px 0; padding-left: 20px;">
+            <li>Our team will review your submission within 1-2 business days</li>
+            <li>You'll receive an email notification once we've completed our review</li>
+            <li>If approved, your account will be marked as verified and you'll get a verified badge on all your listings</li>
+            <li>If we need more information, we'll contact you with details</li>
+        </ul>
+    </div>
+    
+    <div style="background-color: #f9fafb; padding: 16px; border-radius: 4px; margin: 24px 0;">
+        <h4 style="margin-top: 0;">Submission Details</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Submitted on:</td>
+                <td style="padding: 8px 0; text-align: right;">{{ submitted_date }}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">License Number:</td>
+                <td style="padding: 8px 0; text-align: right;">{{ license_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Status:</td>
+                <td style="padding: 8px 0; text-align: right;">
+                    <span style="background-color: #FEE3D5; color: #C2410C; padding: 4px 8px; border-radius: 3px; font-weight: 600;">
+                        Pending Review
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <p style="color: #666; font-size: 14px;">
+        <strong>Note:</strong> Do not reply to this email. If you need to update your submission or have questions, please log in to your account and navigate to the verification section.
+    </p>
+    
+    <p>Best regards,<br>The GhanaHomes Team</p>
+</div>
+{% endblock %}

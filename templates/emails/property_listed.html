@@ -1,0 +1,77 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #28a745; margin-bottom: 20px;">✓ Property Successfully Listed!</h2>
+        
+        <p>Hello {{ user.first_name|default:user.username }},</p>
+        
+        <p>Congratulations! Your property has been successfully posted on GhanaHomes and is now visible to potential tenants.</p>
+        
+        <div style="background-color: #d4edda; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #155724;">
+                <strong>✓ Status:</strong> Live
+            </p>
+            <p style="margin: 10px 0 0 0; color: #155724;">
+                <strong>Posted On:</strong> {{ posted_date|date:"F j, Y, g:i a" }}
+            </p>
+        </div>
+        
+        <h3 style="color: #333; margin-top: 25px;">Property Details</h3>
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Title:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ property.title }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Location:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ property.location }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Price:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">₵{{ property.price }}/month</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Bedrooms:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ property.bedrooms }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Bathrooms:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ property.bathrooms }}</td>
+            </tr>
+        </table>
+        
+        <h3 style="color: #333; margin-top: 25px;">Next Steps:</h3>
+        <ol style="color: #666;">
+            <li>Monitor inquiries from interested tenants</li>
+            <li>Respond promptly to tenant messages</li>
+            <li>Schedule property viewings</li>
+            <li>Update property details if needed</li>
+            <li>Consider promoting for better visibility</li>
+        </ol>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ property_url }}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                View Your Listing
+            </a>
+        </div>
+        
+        <div style="background-color: #e8f4f8; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #0c5460; font-size: 14px;">
+                <strong>💡 Pro Tips for Success:</strong>
+            </p>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #0c5460; font-size: 14px;">
+                <li>Add high-quality photos (at least 5-8 images)</li>
+                <li>Write a detailed property description</li>
+                <li>Be specific about amenities and features</li>
+                <li>Price competitively based on market rates</li>
+                <li>Respond to inquiries within 24 hours</li>
+            </ul>
+        </div>
+        
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #0d6efd; margin-bottom: 20px;">Verify Your Email Address</h2>
+        
+        <p>Hello {{ user.first_name|default:user.username }},</p>
+        
+        <p>Thank you for signing up for GhanaHomes! To complete your registration and start using your account, please verify your email address by clicking the button below.</p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ verification_url }}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                Verify Email Address
+            </a>
+        </div>
+        
+        <p style="color: #666; font-size: 14px;">
+            Or copy and paste this link in your browser:
+        </p>
+        <p style="color: #0d6efd; font-size: 14px; word-break: break-all;">
+            {{ verification_url }}
+        </p>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="margin: 0; color: #666; font-size: 13px;">
+                <strong>Security Note:</strong> This link will expire in 24 hours. If you didn't create this account, please ignore this email.
+            </p>
+        </div>
+        
+        <p>Once verified, you can:</p>
+        <ul style="color: #666;">
+            <li>Complete your profile</li>
+            <li>Browse properties</li>
+            <li>Start messaging landlords or tenants</li>
+            <li>Access your dashboard</li>
+        </ul>
+        
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

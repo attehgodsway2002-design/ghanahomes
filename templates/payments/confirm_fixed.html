@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Payment - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Confirm Payment</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Payment Summary</h5>
+                    
+                    <div class="mb-4">
+                        <p class="mb-2"><strong>Plan:</strong> {{ subscription.plan.name }}</p>
+                        <p class="mb-2"><strong>Duration:</strong> {{ subscription.duration|title }}</p>
+                        <p class="mb-2"><strong>Amount:</strong> ₵{{ payment.amount }}</p>
+                        <p class="mb-2"><strong>Reference:</strong> {{ payment.paystack_reference }}</p>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        You will be redirected to Paystack's secure payment page to complete your payment.
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Accepted Payment Methods:</h6>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <div class="payment-method">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Card</span>
+                            </div>
+                            <div class="payment-method">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>Mobile Money</span>
+                            </div>
+                            <div class="payment-method">
+                                <i class="fas fa-university"></i>
+                                <span>Bank Transfer</span>
+                            </div>
+                            <div class="payment-method">
+                                <i class="fas fa-phone"></i>
+                                <span>USSD</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="payment-form" method="post" action="{% url 'payments:process' payment.id %}">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg position-relative" id="pay-button">
+                                <span class="payment-button-text">
+                                    <i class="fas fa-lock me-2"></i>
+                                    Pay ₵{{ payment.amount }} Securely
+                                </span>
+                                <span class="payment-button-loading d-none">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Processing...
+                                </span>
+                            </button>
+                            <a href="{% url 'subscriptions:plans' %}" class="btn btn-outline-secondary" id="cancel-button">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <div class="secured-by-paystack">
+                    <img src="{% static 'images/paystack-secured.png' %}" alt="Secured by Paystack" height="40">
+                    <p class="text-muted mt-2"><small>256-bit encryption. Your payment information is secure.</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Processing Modal -->
+<div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5 class="mb-0">Initializing Payment...</h5>
+                <p class="text-muted mb-0">Please do not close this window.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    border: none;
+    border-radius: 10px;
+}
+.card-header {
+    border-radius: 10px 10px 0 0;
+}
+.btn-primary {
+    padding: 12px;
+}
+.payment-method {
+    background: #f8f9fa;
+    padding: 8px 16px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.payment-method i {
+    color: #0d6efd;
+}
+.secured-by-paystack {
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+.secured-by-paystack:hover {
+    opacity: 1;
+}
+#pay-button:disabled {
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('payment-form');
+    const payButton = document.getElementById('pay-button');
+    const cancelButton = document.getElementById('cancel-button');
+    const btnText = document.querySelector('.payment-button-text');
+    const btnLoading = document.querySelector('.payment-button-loading');
+    const processingModal = new bootstrap.Modal(document.getElementById('processingModal'));
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Prevent double submission
+        if (payButton.disabled) {
+            return;
+        }
+
+        // Disable buttons and show loading state
+        payButton.disabled = true;
+        cancelButton.disabled = true;
+        btnText.classList.add('d-none');
+        btnLoading.classList.remove('d-none');
+
+        // Show processing modal
+        processingModal.show();
+
+        // Submit form via AJAX to get Paystack URL
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+            body: new FormData(form)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status && data.data && data.data.authorization_url) {
+                // Redirect to Paystack checkout
+                window.location.href = data.data.authorization_url;
+            } else {
+                // Error handling
+                processingModal.hide();
+                alert('Error: ' + (data.message || 'Failed to initialize payment'));
+                payButton.disabled = false;
+                cancelButton.disabled = false;
+                btnText.classList.remove('d-none');
+                btnLoading.classList.add('d-none');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            processingModal.hide();
+            alert('Error processing payment. Please try again.');
+            payButton.disabled = false;
+            cancelButton.disabled = false;
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+        });
+    });
+});
+</script>
+{% endblock %}

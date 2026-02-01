@@ -1,0 +1,44 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #FF6B35; text-align: center; margin-bottom: 24px;">💬 New Inquiry Received</h2>
+    
+    <p>A landlord has received a new inquiry about their property.</p>
+    
+    <div style="background-color: #EFF6FF; border-left: 4px solid #3B82F6; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <h4 style="margin-top: 0; color: #1E40AF;">Inquiry Details</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="border-bottom: 1px solid #BFDBFE;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666; width: 40%;">Tenant:</td>
+                <td style="padding: 8px 0;"><a href="{{ admin_tenant_url }}" style="color: #3B82F6;">{{ tenant.get_full_name|default:tenant.username }}</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #BFDBFE;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Landlord:</td>
+                <td style="padding: 8px 0;"><a href="{{ admin_landlord_url }}" style="color: #3B82F6;">{{ landlord.get_full_name|default:landlord.username }}</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #BFDBFE;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Property:</td>
+                <td style="padding: 8px 0;"><a href="{{ admin_property_url }}" style="color: #3B82F6;">{{ property.title }}</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #BFDBFE;">
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Preferred Contact:</td>
+                <td style="padding: 8px 0;">{{ preferred_contact }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #666;">Received:</td>
+                <td style="padding: 8px 0;">{{ inquiry_date }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div style="background-color: #f9fafb; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <h4 style="margin-top: 0;">Inquiry Message</h4>
+        <p style="margin: 0; color: #666; white-space: pre-wrap; line-height: 1.6;">{{ message }}</p>
+    </div>
+    
+    <p style="color: #666; font-size: 13px;">
+        Both parties will be notified via chat. Monitor for any disputes or issues.
+    </p>
+</div>
+{% endblock %}

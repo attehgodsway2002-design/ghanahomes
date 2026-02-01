@@ -1,0 +1,529 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile - {{ user.get_full_name|default:user.username }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header Section -->
+            <div class="edit-profile-header text-center mb-5">
+                <h1 class="display-5 fw-bold mb-2">Edit Profile</h1>
+                <p class="lead text-muted">Update your account information</p>
+            </div>
+
+            <!-- Edit Profile Card -->
+            <div class="card shadow-lg edit-profile-card">
+                <div class="card-header header-gradient">
+                    <h3 class="mb-0"><i class="fas fa-user-edit me-2"></i>Profile Settings</h3>
+                </div>
+                <div class="card-body p-5">
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                            <strong>Error:</strong> {{ form.non_field_errors.0 }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" class="edit-profile-form">
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information -->
+                        <div class="form-section mb-5">
+                            <div class="section-header">
+                                <i class="fas fa-user section-icon"></i>
+                                <h5>Personal Information</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label fw-bold">First Name</label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}<div class="invalid-feedback d-block text-danger">{{ form.first_name.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label fw-bold">Last Name</label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}<div class="invalid-feedback d-block text-danger">{{ form.last_name.errors.0 }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="form-section mb-5">
+                            <div class="section-header">
+                                <i class="fas fa-phone section-icon"></i>
+                                <h5>Contact Information</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">Email Address</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}<div class="invalid-feedback d-block text-danger">{{ form.email.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label fw-bold">Phone Number</label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}<div class="invalid-feedback d-block text-danger">{{ form.phone.errors.0 }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Picture -->
+                        <div class="form-section mb-5">
+                            <div class="section-header">
+                                <i class="fas fa-image section-icon"></i>
+                                <h5>Profile Picture</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="profile-picture-container">
+                                        {% if user.profile_picture %}
+                                            <img src="{{ user.profile_picture.url }}" alt="Profile" class="profile-picture-preview">
+                                        {% else %}
+                                            <div class="profile-picture-placeholder">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="profile-picture-input">
+                                            {{ form.profile_picture }}
+                                            {% if form.profile_picture.errors %}<div class="invalid-feedback d-block text-danger">{{ form.profile_picture.errors.0 }}</div>{% endif %}
+                                            <small class="form-text text-muted d-block mt-2">JPG or PNG, max 5MB</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="form-section mb-5">
+                            <div class="section-header">
+                                <i class="fas fa-quote-left section-icon"></i>
+                                <h5>Bio</h5>
+                            </div>
+                            <label for="{{ form.bio.id_for_label }}" class="form-label fw-bold">About You</label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}<div class="invalid-feedback d-block text-danger">{{ form.bio.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <!-- Location -->
+                        <div class="form-section mb-5">
+                            <div class="section-header">
+                                <i class="fas fa-map-marker-alt section-icon"></i>
+                                <h5>Location</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.address.id_for_label }}" class="form-label fw-bold">Address</label>
+                                    {{ form.address }}
+                                    {% if form.address.errors %}<div class="invalid-feedback d-block text-danger">{{ form.address.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.city.id_for_label }}" class="form-label fw-bold">City</label>
+                                    {{ form.city }}
+                                    {% if form.city.errors %}<div class="invalid-feedback d-block text-danger">{{ form.city.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.region.id_for_label }}" class="form-label fw-bold">Region</label>
+                                    {{ form.region }}
+                                    {% if form.region.errors %}<div class="invalid-feedback d-block text-danger">{{ form.region.errors.0 }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if user.is_landlord %}
+                        <!-- Business Information -->
+                        <div class="form-section mb-5">
+                            <div class="section-header">
+                                <i class="fas fa-briefcase section-icon"></i>
+                                <h5>Business Information</h5>
+                            </div>
+                            <label for="{{ form.company_name.id_for_label }}" class="form-label fw-bold">Company Name</label>
+                            {{ form.company_name }}
+                            {% if form.company_name.errors %}<div class="invalid-feedback d-block text-danger">{{ form.company_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Social Media -->
+                        <div class="form-section mb-5">
+                            <div class="section-header">
+                                <i class="fas fa-share-alt section-icon"></i>
+                                <h5>Social Media</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.whatsapp.id_for_label }}" class="form-label fw-bold"><i class="fab fa-whatsapp"></i> WhatsApp</label>
+                                    {{ form.whatsapp }}
+                                    {% if form.whatsapp.errors %}<div class="invalid-feedback d-block text-danger">{{ form.whatsapp.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.facebook.id_for_label }}" class="form-label fw-bold"><i class="fab fa-facebook"></i> Facebook</label>
+                                    {{ form.facebook }}
+                                    {% if form.facebook.errors %}<div class="invalid-feedback d-block text-danger">{{ form.facebook.errors.0 }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.instagram.id_for_label }}" class="form-label fw-bold"><i class="fab fa-instagram"></i> Instagram</label>
+                                    {{ form.instagram }}
+                                    {% if form.instagram.errors %}<div class="invalid-feedback d-block text-danger">{{ form.instagram.errors.0 }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notifications -->
+                        <div class="form-section mb-5">
+                            <div class="section-header">
+                                <i class="fas fa-bell section-icon"></i>
+                                <h5>Notifications</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check">
+                                        {{ form.email_notifications }}
+                                        <label class="form-check-label" for="{{ form.email_notifications.id_for_label }}">
+                                            <i class="fas fa-envelope"></i> Email Notifications
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check">
+                                        {{ form.sms_notifications }}
+                                        <label class="form-check-label" for="{{ form.sms_notifications.id_for_label }}">
+                                            <i class="fas fa-sms"></i> SMS Notifications
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Section -->
+                        <div class="form-actions">
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Profile
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ============================================
+       HEADER ANIMATION
+       ============================================ */
+    .edit-profile-header {
+        animation: slideInDown 0.6s ease;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ============================================
+       CARD STYLING
+       ============================================ */
+    .edit-profile-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .edit-profile-card:hover {
+        box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+    }
+
+    .card-header.header-gradient {
+        background: linear-gradient(135deg, #FF6B35 0%, #ff5a20 100%);
+        border: none;
+        color: white;
+        padding: 1.5rem;
+        font-weight: 600;
+    }
+
+    /* ============================================
+       FORM SECTIONS
+       ============================================ */
+    .form-section {
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 2rem;
+    }
+
+    .form-section:last-of-type {
+        border-bottom: none;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-icon {
+        color: #FF6B35;
+        font-size: 1.25rem;
+    }
+
+    .section-header h5 {
+        margin-bottom: 0;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* ============================================
+       FORM CONTROLS
+       ============================================ */
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control,
+    textarea.form-control,
+    select.form-control {
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus,
+    textarea.form-control:focus,
+    select.form-control:focus {
+        border-color: #FF6B35;
+        box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.15);
+        background-color: #fff;
+    }
+
+    /* ============================================
+       PROFILE PICTURE SECTION
+       ============================================ */
+    .profile-picture-container {
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+    }
+
+    .profile-picture-preview {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #FF6B35;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .profile-picture-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-color: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed #e0e0e0;
+        flex-shrink: 0;
+    }
+
+    .profile-picture-placeholder i {
+        font-size: 3rem;
+        color: #ccc;
+    }
+
+    .profile-picture-input {
+        flex: 1;
+    }
+
+    /* ============================================
+       FORM ACTIONS
+       ============================================ */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        padding-top: 2rem;
+        border-top: 2px solid #f0f0f0;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #FF6B35 0%, #ff5a20 100%);
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+        border: 2px solid #6c757d;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    /* ============================================
+       FORM CHECK (CHECKBOXES/RADIOS)
+       ============================================ */
+    .form-check-label {
+        font-weight: 500;
+        cursor: pointer;
+        margin-left: 0.5rem;
+    }
+
+    .form-check input {
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    /* ============================================
+       MOBILE OPTIMIZATIONS (≤768px)
+       ============================================ */
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .display-5 {
+            font-size: 1.8rem;
+        }
+
+        .lead {
+            font-size: 0.95rem;
+        }
+
+        .py-5 {
+            padding-top: 1.5rem !important;
+            padding-bottom: 1.5rem !important;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .form-section {
+            padding-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+        }
+
+        .form-control,
+        textarea.form-control,
+        select.form-control {
+            font-size: 16px;
+            min-height: 44px;
+            padding: 0.75rem;
+        }
+
+        .profile-picture-container {
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .profile-picture-input {
+            width: 100%;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+        }
+    }
+
+    /* ============================================
+       EXTRA SMALL DEVICES (≤576px)
+       ============================================ */
+    @media (max-width: 576px) {
+        .col-lg-8 {
+            padding: 0 !important;
+        }
+
+        .display-5 {
+            font-size: 1.5rem;
+        }
+
+        .card-header.header-gradient {
+            padding: 1rem;
+        }
+
+        .section-header {
+            gap: 0.75rem;
+        }
+
+        .section-icon {
+            font-size: 1rem;
+        }
+
+        .section-header h5 {
+            font-size: 1rem;
+        }
+
+        .card-body {
+            padding: 1rem !important;
+        }
+
+        .form-section {
+            padding-bottom: 1rem;
+        }
+
+        .profile-picture-preview,
+        .profile-picture-placeholder {
+            width: 100px;
+            height: 100px;
+        }
+
+        .profile-picture-placeholder i {
+            font-size: 2.5rem;
+        }
+
+        .form-control,
+        textarea.form-control,
+        select.form-control {
+            font-size: 16px;
+            padding: 0.6rem;
+        }
+
+        .form-actions {
+            gap: 0.5rem;
+            padding-top: 1rem;
+        }
+
+        .form-actions .btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    }
+</style>
+{% endblock %}

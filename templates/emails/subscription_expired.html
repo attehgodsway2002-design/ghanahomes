@@ -1,0 +1,65 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #dc3545; margin-bottom: 20px;">⚠️ Your Subscription Has Expired</h2>
+        
+        <p>Hello {{ user.first_name|default:user.username }},</p>
+        
+        <p>Your GhanaHomes subscription has expired and is now inactive. Your listings have been temporarily deactivated.</p>
+        
+        <div style="background-color: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #721c24;">
+                <strong>📌 Status:</strong> Subscription Expired
+            </p>
+            <p style="margin: 10px 0 0 0; color: #721c24;">
+                <strong>Expired On:</strong> {{ subscription.end_date|date:"F j, Y" }}
+            </p>
+        </div>
+        
+        <h3 style="color: #333; margin-top: 25px;">What Happens Now?</h3>
+        <ul style="color: #666;">
+            <li>Your property listings are no longer visible to tenants</li>
+            <li>You cannot receive new inquiries or messages</li>
+            <li>Your subscription plan features are no longer active</li>
+            <li>Your account data is safe and will be retained for 30 days</li>
+        </ul>
+        
+        <h3 style="color: #333; margin-top: 25px;">Reactivate Your Subscription</h3>
+        <p style="color: #666;">
+            To continue listing properties and receiving inquiries, please renew your subscription. Your listings will be automatically reactivated once your renewal is processed.
+        </p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ renew_url }}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                Renew Now
+            </a>
+        </div>
+        
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Previous Plan:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">{{ subscription.plan.name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Plan Price:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₵{{ subscription.plan.price }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Properties Posted:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">{{ properties_count }}</td>
+            </tr>
+        </table>
+        
+        <div style="background-color: #e8f4f8; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #0c5460; font-size: 14px;">
+                <strong>💡 Tip:</strong> Premium plans offer better visibility and more property slots. Check out our plans to find the best option for your needs.
+            </p>
+        </div>
+        
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

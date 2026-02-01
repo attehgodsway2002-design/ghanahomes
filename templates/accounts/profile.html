@@ -1,0 +1,1226 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ user.get_full_name|default:user.username }} - Profile{% endblock %}
+
+{% block content %}
+<!-- Profile Header Section -->
+<section class="profile-header">
+    <div class="header-backdrop"></div>
+    <div class="container">
+        <div class="header-content">
+            <div class="profile-avatar-wrapper">
+                <div class="profile-avatar">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
+                    {% else %}
+                        <img src="{% static 'images/default-avatar.png' %}" alt="{{ user.username }}">
+                    {% endif %}
+                </div>
+                {% if user.is_verified %}
+                    <span class="verified-badge">
+                        <i class="fas fa-check-circle"></i>
+                    </span>
+                {% endif %}
+            </div>
+            
+            <div class="profile-info">
+                <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
+                <div class="profile-badges">
+                    <span class="badge badge-role">{{ user.get_role_display }}</span>
+                    {% if user.is_verified %}
+                        <span class="badge badge-verified">
+                            <i class="fas fa-shield-check"></i> Verified
+                        </span>
+                    {% endif %}
+                </div>
+                <p class="profile-join-date">Member since {{ user.date_joined|date:"F Y" }}</p>
+            </div>
+            
+            <div class="profile-actions">
+                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i>
+                    <span>Edit Profile</span>
+                </a>
+                {% if user.is_landlord and not user.is_verified %}
+                    <a href="{% url 'accounts:verify_account' %}" class="btn btn-accent">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Get Verified</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content Section -->
+<section class="profile-content">
+    <div class="container">
+        <div class="content-grid">
+            <!-- Sidebar -->
+            <aside class="profile-sidebar">
+                <!-- Contact Information -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <i class="fas fa-address-card"></i>
+                        <h3>Contact Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-group">
+                            <label>Email Address</label>
+                            <p class="info-value">{{ user.email }}</p>
+                        </div>
+                        <div class="info-group">
+                            <label>Phone Number</label>
+                            <p class="info-value">{{ user.phone_number|default:"Not provided" }}</p>
+                        </div>
+                        {% if user.is_landlord and user.company_name %}
+                            <div class="info-group">
+                                <label>Company</label>
+                                <p class="info-value">{{ user.company_name }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Profile Completion - Tenant Only -->
+                {% if not user.is_landlord %}
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Profile Completion</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="completion-stats">
+                                <div class="completion-circle">
+                                    <svg viewBox="0 0 36 36" class="circular-chart">
+                                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="circle" stroke-dasharray="85, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <text x="18" y="20.35" class="percentage">85%</text>
+                                    </svg>
+                                </div>
+                                <p class="completion-text">Your profile is looking great!</p>
+                            </div>
+                            <div class="completion-checklist">
+                                <div class="checklist-item completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Account created</span>
+                                </div>
+                                <div class="checklist-item completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Contact details added</span>
+                                </div>
+                                <div class="checklist-item pending">
+                                    <i class="fas fa-circle"></i>
+                                    <span>Complete bio & location</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Verification Status - Landlord Only -->
+                {% if user.is_landlord %}
+                    <div class="sidebar-card verification-card {% if user.is_verified %}verified{% else %}pending{% endif %}">
+                        <div class="card-header">
+                            <i class="fas fa-shield-alt"></i>
+                            <h3>Verification Status</h3>
+                        </div>
+                        <div class="card-body text-center">
+                            {% if user.is_verified %}
+                                <div class="verification-icon verified">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <h4>Verified Account</h4>
+                                <p>Your account has been successfully verified. Tenants can trust your listings.</p>
+                            {% else %}
+                                <div class="verification-icon pending">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <h4>Verification Pending</h4>
+                                <p>Complete verification to unlock premium features and build trust.</p>
+                                <a href="{% url 'accounts:verify_account' %}" class="btn btn-block btn-outline">
+                                    Start Verification Process
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </aside>
+
+            <!-- Main Content -->
+            <main class="profile-main">
+                {% if not user.is_landlord %}
+                    <!-- Tenant Profile Content -->
+                    
+                    <!-- About Section -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-user"></i>
+                            <h3>About Me</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if user.bio %}
+                                <p class="bio-text">{{ user.bio }}</p>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-file-alt"></i>
+                                    <p>You haven't added a bio yet.</p>
+                                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-sm btn-outline">Add Bio</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Location Information -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <h3>Location</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="location-grid">
+                                <div class="location-item">
+                                    <label>City</label>
+                                    <p>{{ user.city|default:"Not specified" }}</p>
+                                </div>
+                                <div class="location-item">
+                                    <label>Region</label>
+                                    <p>{{ user.region|default:"Not specified" }}</p>
+                                </div>
+                                {% if user.address %}
+                                    <div class="location-item full-width">
+                                        <label>Address</label>
+                                        <p>{{ user.address }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media Links -->
+                    {% if user.whatsapp or user.facebook or user.instagram %}
+                        <div class="content-card">
+                            <div class="card-header">
+                                <i class="fas fa-share-alt"></i>
+                                <h3>Social Media</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="social-links">
+                                    {% if user.whatsapp %}
+                                        <a href="https://wa.me/{{ user.whatsapp }}" class="social-link whatsapp" target="_blank" rel="noopener">
+                                            <i class="fab fa-whatsapp"></i>
+                                            <span>WhatsApp</span>
+                                        </a>
+                                    {% endif %}
+                                    {% if user.facebook %}
+                                        <a href="{{ user.facebook }}" class="social-link facebook" target="_blank" rel="noopener">
+                                            <i class="fab fa-facebook-f"></i>
+                                            <span>Facebook</span>
+                                        </a>
+                                    {% endif %}
+                                    {% if user.instagram %}
+                                        <a href="https://instagram.com/{{ user.instagram }}" class="social-link instagram" target="_blank" rel="noopener">
+                                            <i class="fab fa-instagram"></i>
+                                            <span>Instagram</span>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                {% else %}
+                    <!-- Landlord Profile Content -->
+                    
+                    <!-- Dashboard Statistics -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon purple">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h4>{{ properties_count }}</h4>
+                                <p>Total Properties</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon teal">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h4>{{ active_properties }}</h4>
+                                <p>Active Listings</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Information -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-briefcase"></i>
+                            <h3>Business Information</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-group">
+                                <label>Company Name</label>
+                                <p class="info-value">{{ user.company_name|default:"Not provided" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Plan -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-crown"></i>
+                            <h3>Subscription Plan</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if subscription %}
+                                <div class="subscription-active">
+                                    <div class="subscription-header">
+                                        <h4>{{ subscription.plan.name }}</h4>
+                                        <span class="badge badge-success">Active</span>
+                                    </div>
+                                    <div class="subscription-details">
+                                        <div class="detail-item">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <div>
+                                                <label>Valid Until</label>
+                                                <p>{{ subscription.end_date|date:"F d, Y" }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a href="{% url 'subscriptions:my_subscription' %}" class="btn btn-block btn-outline">
+                                        <i class="fas fa-cog"></i> Manage Subscription
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-crown"></i>
+                                    <h4>No Active Subscription</h4>
+                                    <p>Upgrade to a premium plan to unlock advanced features and list unlimited properties.</p>
+                                    <a href="{% url 'subscriptions:plans' %}" class="btn btn-primary">
+                                        <i class="fas fa-arrow-right"></i> View Plans
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Verification Progress -->
+                    {% if not user.is_verified %}
+                        <div class="content-card">
+                            <div class="card-header">
+                                <i class="fas fa-tasks"></i>
+                                <h3>Verification Progress</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="timeline">
+                                    <div class="timeline-item completed">
+                                        <div class="timeline-marker">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <h5>Account Created</h5>
+                                            <p>Your profile has been successfully set up</p>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item active">
+                                        <div class="timeline-marker">
+                                            <i class="fas fa-hourglass-half"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <h5>Under Review</h5>
+                                            <p>Our team is reviewing your verification documents</p>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <h5>Verified Status</h5>
+                                            <p>Receive your verified badge and gain tenant trust</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                {% endif %}
+            </main>
+        </div>
+    </div>
+</section>
+
+<style>
+:root {
+    --primary-color: #FF6B35;
+    --primary-dark: #E55A2B;
+    --accent-color: #4FACFE;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --danger-color: #EF4444;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F9FAFB;
+    --bg-tertiary: #F3F4F6;
+    --border-color: #E5E7EB;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   PROFILE HEADER
+   ============================================ */
+.profile-header {
+    position: relative;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 3rem 0 2rem;
+    margin-bottom: 2rem;
+}
+
+.header-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 160px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    opacity: 0.08;
+}
+
+.header-content {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 2rem;
+    align-items: center;
+}
+
+.profile-avatar-wrapper {
+    position: relative;
+}
+
+.profile-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 5px solid var(--bg-primary);
+    box-shadow: var(--shadow-xl);
+    background: var(--bg-tertiary);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.verified-badge {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid var(--bg-primary);
+    box-shadow: var(--shadow-md);
+}
+
+.verified-badge i {
+    color: white;
+    font-size: 1.25rem;
+}
+
+.profile-info {
+    min-width: 0;
+}
+
+.profile-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.75rem;
+    line-height: 1.2;
+}
+
+.profile-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: white;
+}
+
+.badge-role {
+    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+}
+
+.badge-verified {
+    background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+}
+
+.badge-success {
+    background: var(--success-color);
+}
+
+.profile-join-date {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.35);
+    color: white;
+}
+
+.btn-accent {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #00C6FB 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.25);
+}
+
+.btn-accent:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.35);
+    color: white;
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-outline:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-block {
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   CONTENT GRID
+   ============================================ */
+.profile-content {
+    padding-bottom: 4rem;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.profile-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sidebar-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.sidebar-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.card-header i {
+    font-size: 1.125rem;
+    color: var(--primary-color);
+}
+
+.card-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.info-group {
+    margin-bottom: 1.5rem;
+}
+
+.info-group:last-child {
+    margin-bottom: 0;
+}
+
+.info-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.375rem;
+}
+
+.info-value {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+    word-wrap: break-word;
+}
+
+/* Completion Stats */
+.completion-stats {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.completion-circle {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1rem;
+}
+
+.circular-chart {
+    width: 100%;
+    height: 100%;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: var(--bg-tertiary);
+    stroke-width: 2.8;
+}
+
+.circle {
+    fill: none;
+    stroke: var(--success-color);
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    animation: progress 1.5s ease-out forwards;
+}
+
+@keyframes progress {
+    0% { stroke-dasharray: 0 100; }
+}
+
+.percentage {
+    fill: var(--text-primary);
+    font-size: 0.5rem;
+    font-weight: 700;
+    text-anchor: middle;
+}
+
+.completion-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.completion-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.checklist-item.completed i {
+    color: var(--success-color);
+}
+
+.checklist-item.pending i {
+    color: var(--text-muted);
+    font-size: 0.625rem;
+}
+
+/* Verification Card */
+.verification-card.verified {
+    border-color: var(--success-color);
+}
+
+.verification-card.pending {
+    border-color: var(--warning-color);
+}
+
+.verification-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+.verification-icon.verified {
+    background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+    color: white;
+}
+
+.verification-icon.pending {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.verification-card h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+}
+
+.verification-card p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0 0 1.25rem;
+    line-height: 1.5;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.profile-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.content-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.content-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.bio-text {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+}
+
+.empty-state p {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    margin: 0 0 1.5rem;
+    line-height: 1.6;
+}
+
+/* Location Grid */
+.location-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+.location-item {
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+}
+
+.location-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.location-item label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.375rem;
+}
+
+.location-item p {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Social Links */
+.social-links {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    flex: 1;
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.social-link i {
+    font-size: 1.5rem;
+}
+
+.social-link.whatsapp {
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+}
+
+.social-link.facebook {
+    background: linear-gradient(135deg, #1877F2 0%, #0A66C2 100%);
+}
+
+.social-link.instagram {
+    background: linear-gradient(135deg, #E1306C 0%, #C13584 100%);
+}
+
+.social-link:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    color: white;
+}
+
+/* ============================================
+   LANDLORD CONTENT
+   ============================================ */
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stat-icon.purple {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+}
+
+.stat-icon.teal {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #00C6FB 100%);
+}
+
+.stat-details h4 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem;
+    line-height: 1;
+}
+
+.stat-details p {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* Subscription */
+.subscription-active {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #F5F7FA 0%, #C3CFE2 100%);
+    border-radius: var(--radius-md);
+}
+
+.subscription-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.subscription-header h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.subscription-details {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.detail-item i {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    margin-top: 0.25rem;
+}
+
+.detail-item label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.detail-item p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding: 1rem 0;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 21px;
+    top: 50px;
+    width: 2px;
+    height: calc(100% + 1rem);
+    background: var(--border-color);
+}
+
+.timeline-item:last-child::before {
+    display: none;
+}
+
+.timeline-item.completed::before {
+    background: var(--success-color);
+}
+
+.timeline-item.active::before {
+    background: var(--warning-color);
+}
+
+.timeline-marker {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    z-index: 1;
+    position: relative;
+}
+
+.timeline-item.completed .timeline-marker {
+    background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+    color: white;
+}
+
+.timeline-item.active .timeline-marker {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.timeline-content h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.375rem;
+}
+
+.timeline-content p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1024px) {
+    .content-grid {
+        grid-template-columns: 280px 1fr;
+        gap: 1.5rem;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .profile-name {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .profile-avatar-wrapper {
+        margin: 0 auto;
+    }
+    
+    .profile-avatar {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .profile-badges {
+        justify-content: center;
+    }
+    
+    .profile-actions {
+        justify-content: center;
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .location-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .social-links {
+        flex-direction: column;
+    }
+    
+    .social-link {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        padding: 2rem 0 1.5rem;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-width: 4px;
+    }
+    
+    .verified-badge {
+        width: 36px;
+        height: 36px;
+        border-width: 3px;
+    }
+    
+    .verified-badge i {
+        font-size: 1rem;
+    }
+    
+    .profile-name {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    .stat-card {
+        padding: 1.25rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 1.5rem;
+    }
+    
+    .stat-details h4 {
+        font-size: 1.75rem;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Retry Required - GhanaHomes</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            border-bottom: 3px solid #FFA500;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #222;
+            font-size: 24px;
+        }
+        .content {
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+        .alert {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .alert h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #FFA500;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .cta-button:hover {
+            background-color: #ff8c00;
+        }
+        .payment-details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .payment-details p {
+            margin: 10px 0;
+        }
+        .footer {
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+            padding-top: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        .footer a {
+            color: #FFA500;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚠️ Payment Retry Required</h1>
+        </div>
+
+        <div class="content">
+            <p>Hello <strong>{{ user.first_name|default:user.username }}</strong>,</p>
+
+            <p>We encountered a timeout while processing your payment for your GhanaHomes subscription. This can happen if there's a temporary network issue or if the payment provider is experiencing delays.</p>
+
+            <div class="alert">
+                <h3>Your payment requires action</h3>
+                <p>
+                    Your payment (Reference: <strong>{{ payment.paystack_reference }}</strong>) 
+                    for <strong>{{ payment.subscription.plan.name }}</strong> plan 
+                    is still pending after {{ payment.subscription.duration }} month(s).
+                </p>
+                <p>
+                    <strong>Amount:</strong> ₵{{ payment.amount|floatformat:2 }}
+                </p>
+            </div>
+
+            <p>Please click the button below to retry your payment:</p>
+
+            <center>
+                <a href="{{ retry_link }}" class="cta-button">Retry Payment</a>
+            </center>
+
+            <p>Or copy and paste this link in your browser:</p>
+            <p><code>{{ retry_link }}</code></p>
+
+            <div class="payment-details">
+                <h4>Payment Details:</h4>
+                <p><strong>Reference:</strong> {{ payment.paystack_reference }}</p>
+                <p><strong>Amount:</strong> ₵{{ payment.amount|floatformat:2 }}</p>
+                <p><strong>Plan:</strong> {{ payment.subscription.plan.name }}</p>
+                <p><strong>Duration:</strong> {{ payment.subscription.duration }} month(s)</p>
+                <p><strong>Status:</strong> Pending</p>
+            </div>
+
+            <p>
+                <strong>Need help?</strong> If you continue to experience issues with your payment, 
+                please <a href="mailto:realhuntsmen.tech@gmail.com">contact our support team</a>.
+            </p>
+
+            <p>
+                Thank you for choosing GhanaHomes!
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>GhanaHomes</strong> by <strong>Huntsmen</strong><br>
+                Your trusted platform for finding and renting properties across Ghana.
+            </p>
+            <p>
+                © {% now "Y" %} <strong>Huntsmen</strong>. All rights reserved. | 
+                <a href="{{ site_url }}">Visit our site</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

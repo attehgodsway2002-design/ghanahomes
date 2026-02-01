@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Subscription - GhanaHomes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .plan-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .plan-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+
+    .plan-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .plan-name {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .plan-status {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid #eee;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .progress-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #eee;
+    }
+
+    .progress-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .progress {
+        height: 12px;
+        border-radius: 10px;
+        background: #f0f0f0;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .feature-item {
+        background: #f8f9ff;
+        padding: 1rem;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+        text-align: center;
+    }
+
+    .feature-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .feature-text {
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn-action {
+        padding: 1rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-primary-action {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-success-action {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .btn-secondary-action {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    .alert-custom {
+        border-radius: 12px;
+        border: none;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-danger-custom {
+        background: linear-gradient(135deg, rgba(220,53,69,0.1), rgba(220,53,69,0.05));
+        border-left: 4px solid #dc3545;
+        color: #721c24;
+    }
+
+    .alert-warning-custom {
+        background: linear-gradient(135deg, rgba(255,193,7,0.1), rgba(255,193,7,0.05));
+        border-left: 4px solid #ffc107;
+        color: #856404;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Plan Header -->
+    <div class="plan-header">
+        <div class="plan-header-content">
+            <div class="plan-name">{{ subscription.plan.name }}</div>
+            <div class="plan-status">
+                {% if subscription.status == 'active' %}
+                    <i class="fas fa-check-circle"></i> Active
+                {% else %}
+                    {{ subscription.status|upper }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ subscription.plan.property_limit }}</div>
+                <div class="stat-label">Total Properties</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ subscription.property_count }}</div>
+                <div class="stat-label">Posted</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ properties_remaining }}</div>
+                <div class="stat-label">Remaining</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ subscription.duration|upper|slice:":1" }}</div>
+                <div class="stat-label">{{ subscription.duration|title }} Plan</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    {% if is_limit_exhausted %}
+    <div class="alert alert-custom alert-danger-custom alert-dismissible fade show" role="alert">
+        <h5 class="mb-2"><i class="fas fa-exclamation-circle"></i> Property Limit Exhausted!</h5>
+        <p class="mb-0">You've reached your property posting limit. Renew your subscription to get more properties or upgrade to a higher tier plan.</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% elif is_near_limit %}
+    <div class="alert alert-custom alert-warning-custom alert-dismissible fade show" role="alert">
+        <h5 class="mb-2"><i class="fas fa-exclamation-triangle"></i> Approaching Your Limit!</h5>
+        <p class="mb-0">You have only {{ properties_remaining }} properties remaining on your plan. Consider renewing or upgrading soon to avoid any interruption.</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Property Usage -->
+    <div class="progress-container">
+        <div class="progress-title">
+            <span><i class="fas fa-chart-bar"></i> Property Usage</span>
+            <span class="text-muted">{{ subscription.property_count }} / {{ subscription.plan.property_limit }}</span>
+        </div>
+        <div class="progress">
+            <div class="progress-bar {% if is_limit_exhausted %}bg-danger{% elif is_near_limit %}bg-warning{% else %}bg-success{% endif %}" 
+                 style="width: {{ property_usage_percentage }}%"></div>
+        </div>
+    </div>
+
+    <!-- Subscription Details Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="bg-white border border-1 rounded-12 p-4">
+                <h6 class="mb-3 fw-bold"><i class="fas fa-calendar-alt text-primary"></i> Timeline</h6>
+                <div class="mb-3">
+                    <small class="text-muted">Started</small>
+                    <p class="mb-0"><strong>{{ subscription.start_date|date:"F j, Y" }}</strong></p>
+                </div>
+                <div>
+                    <small class="text-muted">Expires</small>
+                    <p class="mb-0"><strong>{{ subscription.end_date|date:"F j, Y" }}</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="bg-white border border-1 rounded-12 p-4">
+                <h6 class="mb-3 fw-bold"><i class="fas fa-info-circle text-info"></i> Plan Info</h6>
+                <div class="mb-3">
+                    <small class="text-muted">Duration</small>
+                    <p class="mb-0"><strong>{{ subscription.duration|title }}</strong></p>
+                </div>
+                <div>
+                    <small class="text-muted">Photos Per Property</small>
+                    <p class="mb-0"><strong>{{ subscription.plan.photo_limit }} photos</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plan Features -->
+    <div class="bg-white border border-1 rounded-12 p-4 mb-4">
+        <h5 class="mb-4 fw-bold"><i class="fas fa-star text-warning"></i> Your Plan Features</h5>
+        <div class="feature-grid">
+            {% if subscription.plan.priority_support %}
+            <div class="feature-item">
+                <span class="feature-icon"><i class="fas fa-headset text-primary"></i></span>
+                <span class="feature-text">Priority Support</span>
+            </div>
+            {% endif %}
+            {% if subscription.plan.analytics %}
+            <div class="feature-item">
+                <span class="feature-icon"><i class="fas fa-chart-line text-success"></i></span>
+                <span class="feature-text">Analytics</span>
+            </div>
+            {% endif %}
+            {% if subscription.plan.verified_badge %}
+            <div class="feature-item">
+                <span class="feature-icon"><i class="fas fa-badge-check text-info"></i></span>
+                <span class="feature-text">Verified Badge</span>
+            </div>
+            {% endif %}
+            {% if subscription.plan.social_media_promotion %}
+            <div class="feature-item">
+                <span class="feature-icon"><i class="fas fa-share-alt text-danger"></i></span>
+                <span class="feature-text">Social Promotion</span>
+            </div>
+            {% endif %}
+            {% if subscription.plan.featured_listings > 0 %}
+            <div class="feature-item">
+                <span class="feature-icon"><i class="fas fa-crown text-warning"></i></span>
+                <span class="feature-text">{{ subscription.plan.featured_listings }} Featured</span>
+            </div>
+            {% endif %}
+            <div class="feature-item">
+                <span class="feature-icon"><i class="fas fa-image text-muted"></i></span>
+                <span class="feature-text">{{ subscription.plan.photo_limit }} Photos</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-grid">
+        <a href="{% url 'properties:property_create' %}" class="btn-action btn-success-action {% if is_limit_exhausted %}disabled opacity-50{% endif %}">
+            <i class="fas fa-plus"></i> Post New Property
+        </a>
+        <a href="{% url 'properties:property_list' %}" class="btn-action btn-secondary-action">
+            <i class="fas fa-list"></i> My Properties
+        </a>
+        <a href="{% url 'subscriptions:renew' %}" class="btn-action btn-primary-action">
+            <i class="fas fa-sync-alt"></i> {% if is_limit_exhausted %}Renew Now{% else %}Renew Plan{% endif %}
+        </a>
+        <a href="{% url 'subscriptions:plans' %}" class="btn-action btn-primary-action">
+            <i class="fas fa-arrow-up"></i> Upgrade Plan
+        </a>
+    </div>
+
+    <!-- Cancel Button -->
+    <div class="mt-4">
+        <a href="{% url 'subscriptions:cancel' %}" class="btn btn-outline-danger w-100" onclick="return confirm('Are you sure? You will lose access after your current plan expires.');">
+            <i class="fas fa-times-circle"></i> Cancel Subscription
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="color: #FFA500; margin-top: 0;">Welcome to GhanaHomes!</h2>
+<p>Hello {{ user.first_name|default:user.username }},</p>
+<p>Thank you for creating a GhanaHomes account. We're excited to help you find or rent the perfect property!</p>
+
+<div style="background-color: #d4edda; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0; border-radius: 3px;">
+    <p style="margin: 0; color: #155724; font-size: 14px;">
+        <strong>✓ Account Created:</strong> Your account is ready to use.
+    </p>
+</div>
+
+<p style="color: #666; font-size: 14px; margin-top: 20px;">
+    <strong>What you can do now:</strong>
+</p>
+<ul style="color: #666; font-size: 14px; margin: 10px 0;">
+    <li>Browse available properties</li>
+    <li>Save your favorite listings</li>
+    <li>Contact landlords directly</li>
+    <li>Schedule property viewings</li>
+</ul>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{ browse_url }}" style="background-color: #FFA500; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Browse Properties</a>
+</div>
+
+<p style="color: #666; font-size: 14px;">
+    If you have any questions, feel free to <a href="#" style="color: #FFA500; text-decoration: none;">contact our support team</a>.
+</p>
+
+<p>Welcome aboard!<br><strong>The GhanaHomes Team</strong></p>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Payment - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Confirm Payment</h4>
+                </div>
+                <div class="card-body">
+                    <form id="payment-form" method="post" action="{% url 'payments:process' payment.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <h5>Payment Details</h5>
+                            <div class="payment-method mb-3">
+                                <i class="fas fa-credit-card fa-lg"></i>
+                                <span>Pay with Paystack</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Subscription Plan:</strong>
+                                <span>{{ subscription.plan.name }}</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Duration:</strong>
+                                <span>{{ subscription.get_duration_display }}</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Amount:</strong>
+                                <span>{{ payment.currency }} {{ payment.amount }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" id="pay-button" class="btn btn-primary btn-lg">
+                                <span class="payment-button-text">Proceed with Payment</span>
+                                <span class="payment-button-loading d-none">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    Processing...
+                                </span>
+                            </button>
+                            
+                            <a href="{% url 'payments:cancel' %}" id="cancel-button" class="btn btn-outline-secondary">
+                                Cancel Payment
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <img src="https://paystack.com/assets/payment/badges/secured-by-paystack.png" 
+                             alt="Secured by Paystack" 
+                             class="secured-by-paystack"
+                             style="height: 32px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Processing Modal -->
+<div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5 class="mb-0">Initializing Payment...</h5>
+                <p class="text-muted mb-0">Please do not close this window.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    border: none;
+    border-radius: 10px;
+}
+.card-header {
+    border-radius: 10px 10px 0 0;
+}
+.btn-primary {
+    padding: 12px;
+}
+.payment-method {
+    background: #f8f9fa;
+    padding: 8px 16px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.payment-method i {
+    color: #0d6efd;
+}
+.secured-by-paystack {
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+.secured-by-paystack:hover {
+    opacity: 1;
+}
+#pay-button:disabled {
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Paystack Inline JS -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('payment-form');
+    const payButton = document.getElementById('pay-button');
+    const cancelButton = document.getElementById('cancel-button');
+    const btnText = document.querySelector('.payment-button-text');
+    const btnLoading = document.querySelector('.payment-button-loading');
+    const processingModal = new bootstrap.Modal(document.getElementById('processingModal'));
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Prevent double submission
+        if (payButton.disabled) {
+            return;
+        }
+
+        // Disable buttons and show loading state
+        payButton.disabled = true;
+        cancelButton.disabled = true;
+        btnText.classList.add('d-none');
+        btnLoading.classList.remove('d-none');
+        
+        // Show processing modal
+        processingModal.show();
+
+        // Get the CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Submit form using fetch
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(new FormData(form))
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === false) {
+                throw new Error(data.message || 'Payment initialization failed');
+            }
+
+            // Redirect the browser to Paystack checkout URL returned by the server.
+            // Using a direct navigation avoids popup/iframe blocking in many browsers.
+            const authUrl = data.data && (data.data.authorization_url || data.data.authorizationUrl || data.authorization_url);
+            if (authUrl) {
+                window.location.href = authUrl;
+                return;
+            }
+
+            // Fallback: if there's no auth URL, show an error
+            throw new Error('No authorization URL returned from payment initialization');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Hide loading state
+            payButton.disabled = false;
+            cancelButton.disabled = false;
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+            processingModal.hide();
+            
+            // Show error message
+            alert('Payment processing failed. Please try again or contact support.');
+        });
+    });
+});
+</script>
+{% endblock %}

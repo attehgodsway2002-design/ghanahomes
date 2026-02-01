@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Successful - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-success shadow-lg">
+                <div class="card-body text-center py-5">
+                    <!-- Success Icon -->
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <!-- Success Message -->
+                    <h2 class="text-success mb-2">Payment Successful! 🎉</h2>
+                    <p class="text-muted">Your payment was received and your subscription is now active. Thank you!</p>
+                    
+                    <!-- Plan Details -->
+                    {% if payment and subscription and plan %}
+                    <div class="alert alert-info mt-4 mb-4 text-left">
+                        <p><strong>Plan:</strong> {{ plan.name }}</p>
+                        <p><strong>Amount Paid:</strong> ₵{{ payment.amount }}</p>
+                        <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Property Slots Info (for landlords) -->
+                    {% if user.is_authenticated and user.is_landlord %}
+                        {% if properties_remaining is not None %}
+                        <div class="alert alert-primary mt-4 mb-4">
+                            <p class="mb-0">
+                                <strong>Property Slots:</strong> You have 
+                                <strong class="text-success">{{ properties_remaining }}</strong> 
+                                property slot(s) remaining on your plan.
+                            </p>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-5">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <a href="{% url 'subscriptions:my_subscription' %}" class="btn btn-outline-primary btn-block">
+                                    <i class="fas fa-clipboard-list"></i> View Subscription
+                                </a>
+                            </div>
+                            {% if user.is_authenticated and user.is_landlord %}
+                            <div class="col-md-6 mb-2">
+                                <a href="{{ post_property_url }}" class="btn btn-success btn-block btn-lg">
+                                    <i class="fas fa-plus-circle"></i> Start Posting Properties
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="col-md-6 mb-2">
+                                <a href="{% url 'properties:list' %}" class="btn btn-primary btn-block">
+                                    <i class="fas fa-search"></i> Browse Properties
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Back Home Link -->
+                    <div class="mt-3">
+                        <a href="{% url 'properties:home' %}" class="text-muted small">← Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-block {
+        display: block;
+        width: 100%;
+    }
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

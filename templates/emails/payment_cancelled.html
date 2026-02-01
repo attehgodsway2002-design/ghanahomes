@@ -1,0 +1,58 @@
+{% extends 'emails/base_email.html' %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #dc3545; margin-bottom: 20px;">Payment Cancelled</h2>
+        
+        <p>Hello {{ payment.user.get_full_name|default:payment.user.username }},</p>
+        
+        <p>Your recent payment attempt was cancelled. Here are the details:</p>
+        
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Amount:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">₵{{ payment.amount }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Reference:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.paystack_reference }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Plan:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.subscription.plan.name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Date:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ payment.updated_at|date:"F j, Y, g:i a" }}</td>
+            </tr>
+        </table>
+
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="margin: 0;">
+                <i style="color: #0d6efd;">ℹ️</i>
+                You can try the payment again by visiting our subscription plans page.
+            </p>
+        </div>
+
+        <div style="margin: 30px 0;">
+            <a href="{{ site_url }}{% url 'subscriptions:plans' %}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                View Subscription Plans
+            </a>
+        </div>
+
+        <p>If you experienced any issues during the payment process or need assistance, please don't hesitate to contact our support team.</p>
+
+        <p>Common reasons for payment cancellation:</p>
+        <ul style="color: #666;">
+            <li>Insufficient funds</li>
+            <li>Card declined by issuing bank</li>
+            <li>Payment session timeout</li>
+            <li>User-initiated cancellation</li>
+        </ul>
+
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

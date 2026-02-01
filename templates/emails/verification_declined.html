@@ -1,0 +1,27 @@
+{% extends 'emails/base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2 style="color: #EF4444; text-align: center; margin-bottom: 24px;">Account Verification Declined</h2>
+    
+    <p>Hi {{ user.get_full_name|default:user.username }},</p>
+    
+    <p>Thank you for submitting your verification documents. After careful review, we're unable to approve your verification request at this time.</p>
+    
+    <div style="background-color: #fef2f2; border-left: 4px solid #EF4444; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <h4 style="margin-top: 0; color: #7F1D1D;">Reason for Decline:</h4>
+        <p style="margin: 8px 0;">{{ reason }}</p>
+    </div>
+    
+    <div style="background-color: #fef3c7; border-left: 4px solid #F59E0B; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <h4 style="margin-top: 0; color: #92400E;">Next Steps</h4>
+        <p style="margin: 8px 0;">You can submit a new verification request with corrected documents or additional information. Please make sure all documents are clear, valid, and meet our verification requirements.</p>
+        
+        <a href="{{ retry_url }}" style="display: inline-block; background-color: #F59E0B; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: 600; margin-top: 12px;">Retry Verification</a>
+    </div>
+    
+    <p>If you believe this is an error or have questions about the requirements, please contact our support team for assistance.</p>
+    
+    <p>Best regards,<br>The GhanaHomes Team</p>
+</div>
+{% endblock %}

@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Renew Subscription - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1>Renew or Upgrade Your Plan</h1>
+                <p class="text-muted">Keep your properties online and accessible</p>
+            </div>
+
+            <!-- Current Plan Info -->
+            <div class="card shadow-sm mb-4 border-0 border-start border-primary border-5">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><small class="text-muted">Current Plan</small></p>
+                            <h5 class="mb-3">{{ subscription.plan.name }}</h5>
+                            <p class="mb-1"><i class="fas fa-cubes"></i> <strong>{{ subscription.plan.property_limit }}</strong> Properties</p>
+                            <p class="mb-0"><i class="fas fa-image"></i> <strong>{{ subscription.property_count }}</strong> Posted</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><small class="text-muted">Status</small></p>
+                            <p class="mb-3">
+                                <span class="badge bg-{{ subscription.status|default:'secondary' }}">
+                                    {{ subscription.status|upper }}
+                                </span>
+                            </p>
+                            <p class="mb-1"><i class="fas fa-calendar-alt"></i> Expires: <strong>{{ subscription.end_date|date:"M d, Y" }}</strong></p>
+                            {% if days_until_expiry > 0 %}
+                                <p class="mb-0 text-warning"><i class="fas fa-exclamation-circle"></i> {{ days_until_expiry }} days left</p>
+                            {% else %}
+                                <p class="mb-0 text-danger"><i class="fas fa-times-circle"></i> Expired</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if subscription.property_count >= subscription.plan.property_limit %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> <strong>Property Limit Reached!</strong>
+                <p class="mb-0 mt-2">You have posted {{ subscription.property_count }} out of {{ subscription.plan.property_limit }} allowed properties. Renew or upgrade to continue posting.</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+
+            <!-- Plan Selection -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-5">
+                            <h6 class="mb-4 fw-bold"><i class="fas fa-layer-group"></i> Select Your Plan</h6>
+                            <div class="row g-3">
+                                {% for plan in available_plans %}
+                                <div class="col-md-6">
+                                    <label class="plan-option">
+                                        <input type="radio" name="plan_type" value="{{ plan.plan_type }}" 
+                                            class="plan-radio" {% if plan.id == subscription.plan.id %}checked{% endif %}>
+                                        <div class="card h-100 border-2 {% if plan.id == subscription.plan.id %}border-primary{% else %}border-light{% endif %} plan-card">
+                                            <div class="card-body">
+                                                <h6 class="card-title mb-2">{{ plan.name }}</h6>
+                                                {% if plan.is_free %}
+                                                    <p class="text-success fw-bold mb-3">FREE</p>
+                                                {% else %}
+                                                    <p class="text-primary fw-bold mb-3">₵{{ plan.price_monthly }}<span class="fs-6">/mo</span></p>
+                                                {% endif %}
+                                                <ul class="list-unstyled small">
+                                                    <li class="mb-1"><i class="fas fa-check text-success"></i> {{ plan.property_limit }} properties</li>
+                                                    {% if plan.featured_listings > 0 %}
+                                                    <li class="mb-1"><i class="fas fa-star text-warning"></i> {{ plan.featured_listings }} featured</li>
+                                                    {% endif %}
+                                                    {% if plan.priority_support %}
+                                                    <li><i class="fas fa-headset text-info"></i> Priority support</li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Duration Selection -->
+                        <div class="mb-5" id="duration_section">
+                            <h6 class="mb-4 fw-bold"><i class="fas fa-hourglass-half"></i> Duration</h6>
+                            {{ form.duration }}
+                        </div>
+
+                        <!-- Auto-Renew Option -->
+                        <div class="mb-5 form-check">
+                            {{ form.auto_renew }}
+                            <label class="form-check-label" for="{{ form.auto_renew.id_for_label }}">
+                                <strong>Enable auto-renewal</strong>
+                                <p class="text-muted small mt-1 mb-0">Your subscription will automatically renew on the expiration date</p>
+                            </label>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'subscriptions:my_subscription' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Continue to Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .plan-option {
+        cursor: pointer;
+        display: block;
+    }
+    
+    .plan-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background-color: #f8f9fa;
+    }
+    
+    .plan-option input[type="radio"]:checked + .plan-card {
+        background-color: #e7f1ff;
+        border-color: #0d6efd !important;
+    }
+    
+    .plan-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function selectPlan(planType) {
+        document.querySelector(`input[value="${planType}"]`).checked = true;
+    }
+
+    // Update duration visibility based on selected plan
+    document.querySelectorAll('.plan-radio').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const planType = this.value;
+            const isFree = document.querySelector(`input[value="${planType}"]`).closest('.plan-card').textContent.includes('FREE');
+            document.getElementById('duration_section').style.display = isFree ? 'none' : 'block';
+        });
+    });
+
+    // Check initial state
+    const checkedRadio = document.querySelector('.plan-radio:checked');
+    if (checkedRadio) {
+        const isFree = checkedRadio.closest('.plan-card').textContent.includes('FREE');
+        document.getElementById('duration_section').style.display = isFree ? 'none' : 'block';
+    }
+</script>
+{% endblock %}
+            <!-- Current Plan Info -->
+            <div class="card mb-4 border-info">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-info-circle"></i> Current Plan</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Plan:</strong> {{ subscription.plan.name }}</p>
+                            <p><strong>Property Limit:</strong> {{ subscription.plan.property_limit }}</p>
+                            <p><strong>Posted Properties:</strong> {{ subscription.property_count }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Status:</strong> <span class="badge bg-{{ subscription.status|default:'secondary' }}">{{ subscription.status|upper }}</span></p>
+                            <p><strong>Expires:</strong> {{ subscription.end_date|date:"M d, Y H:i" }}</p>
+                            {% if days_until_expiry > 0 %}
+                                <p><strong class="text-warning">Days Left:</strong> {{ days_until_expiry }} days</p>
+                            {% else %}
+                                <p><strong class="text-danger">Expired</strong></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Renewal Form -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-sync-alt"></i> Renew or Upgrade</h4>
+                </div>
+                <div class="card-body">
+                    {% if subscription.property_count >= subscription.plan.property_limit %}
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle"></i> <strong>Your property limit is exhausted.</strong> Renew the same plan to get {{ subscription.plan.property_limit }} more properties, or upgrade to a higher tier for even more.
+                        </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Plan Selection -->
+                        <div class="mb-4">
+                            <label for="plan_type" class="form-label"><strong>Select Plan</strong></label>
+                            <div class="row g-3">
+                                {% for plan in available_plans %}
+                                    <div class="col-md-6">
+                                        <div class="card plan-card h-100 {% if plan.id == subscription.plan.id %}border-primary border-2{% endif %}" onclick="selectPlan('{{ plan.plan_type }}')">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ plan.name }}</h5>
+                                                {% if plan.is_free %}
+                                                    <p class="text-success"><strong>FREE</strong></p>
+                                                {% else %}
+                                                    <p class="text-primary"><strong>₵{{ plan.price_monthly }}/month</strong></p>
+                                                {% endif %}
+                                                <p class="card-text small">
+                                                    📦 {{ plan.property_limit }} properties<br>
+                                                    {% if plan.featured_listings > 0 %}⭐ {{ plan.featured_listings }} featured<br>{% endif %}
+                                                    {% if plan.priority_support %}<i class="fas fa-check text-success"></i> Priority support<br>{% endif %}
+                                                </p>
+                                                <input type="radio" name="plan_type" value="{{ plan.plan_type }}" class="plan-radio" {% if plan.id == subscription.plan.id %}checked{% endif %}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Duration Selection (hidden for free plans) -->
+                        <div id="duration_section" class="mb-4">
+                            <label for="id_duration" class="form-label"><strong>Duration</strong></label>
+                            {{ form.duration }}
+                            <small class="text-muted d-block mt-2">
+                                Free plans are limited to 30 days only.
+                            </small>
+                        </div>
+
+                        <!-- Auto-Renew Option -->
+                        <div class="mb-4 form-check">
+                            {{ form.auto_renew }}
+                            <label class="form-check-label" for="id_auto_renew">
+                                <strong>Auto-renew</strong> - Automatically renew when plan expires
+                            </label>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'subscriptions:my_subscription' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Continue to Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="alert alert-info mt-4">
+                <h6><i class="fas fa-lightbulb"></i> Renewal Tips</h6>
+                <ul class="mb-0">
+                    <li>Renew before expiration to maintain uninterrupted access</li>
+                    <li>You can upgrade to a higher plan anytime</li>
+                    <li>Free trial users must subscribe to continue posting after 30 days</li>
+                    <li>Enable auto-renew for seamless subscription management</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .plan-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .plan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .plan-card input[type="radio"] {
+        cursor: pointer;
+        margin-top: 10px;
+    }
+</style>
+
+<script>
+    function selectPlan(planType) {
+        document.querySelector(`input[value="${planType}"]`).checked = true;
+    }
+
+    // Update duration visibility based on selected plan
+    document.querySelectorAll('.plan-radio').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const planType = this.value;
+            const isFree = document.querySelector(`input[value="${planType}"]`).closest('.plan-card').textContent.includes('FREE');
+            document.getElementById('duration_section').style.display = isFree ? 'none' : 'block';
+        });
+    });
+
+    // Check initial state
+    const checkedRadio = document.querySelector('.plan-radio:checked');
+    if (checkedRadio) {
+        const isFree = checkedRadio.closest('.plan-card').textContent.includes('FREE');
+        document.getElementById('duration_section').style.display = isFree ? 'none' : 'block';
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Properties - Admin - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2">Manage Properties</h1>
+            <p class="text-muted">{{ property_count }} total properties</p>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'admin:index' %}" class="btn btn-secondary">Back to Admin</a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Search properties..." value="{{ request.GET.q }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="available" {% if request.GET.status == 'available' %}selected{% endif %}>Available</option>
+                        <option value="rented" {% if request.GET.status == 'rented' %}selected{% endif %}>Rented</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="property_type" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="apartment" {% if request.GET.property_type == 'apartment' %}selected{% endif %}>Apartment</option>
+                        <option value="house" {% if request.GET.property_type == 'house' %}selected{% endif %}>House</option>
+                        <option value="villa" {% if request.GET.property_type == 'villa' %}selected{% endif %}>Villa</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Properties Table -->
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Owner</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Price</th>
+                        <th>Posted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for property in properties %}
+                    <tr>
+                        <td>{{ property.title|truncatewords:5 }}</td>
+                        <td>{{ property.owner.username }}</td>
+                        <td>{{ property.get_property_type_display }}</td>
+                        <td>
+                            <span class="badge bg-{% if property.status == 'available' %}success{% elif property.status == 'rented' %}primary{% else %}warning{% endif %}">
+                                {{ property.get_status_display }}
+                            </span>
+                        </td>
+                        <td>₵{{ property.price|floatformat:0 }}</td>
+                        <td><small class="text-muted">{{ property.created_at|date:"M d, Y" }}</small></td>
+                        <td>
+                            <a href="{% url 'admin:properties_property_change' property.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No properties found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

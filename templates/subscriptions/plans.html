@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Subscription Plans - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="mb-2">Choose Your Plan</h1>
+        <p class="text-muted lead">Select the perfect plan for your property listing needs</p>
+    </div>
+
+    {% if messages %}
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        {% for plan in plans %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0 {% if current_subscription and current_subscription.plan == plan %}border-primary border-3{% endif %} transition">
+                <div class="card-body d-flex flex-column">
+                    <h4 class="card-title mb-3">{{ plan.name }}</h4>
+                    
+                    <div class="mb-4">
+                        {% if plan.is_free %}
+                            <div class="display-5 text-success fw-bold">Free</div>
+                            <p class="text-muted small">Limited 30 days trial</p>
+                        {% else %}
+                            <div class="display-5 fw-bold">₵{{ plan.price_monthly }}<span class="fs-6 text-muted">/mo</span></div>
+                        {% endif %}
+                    </div>
+
+                    <ul class="list-unstyled mb-4 flex-grow-1">
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> <strong>{{ plan.property_limit }}</strong> Properties</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> <strong>{{ plan.photo_limit }}</strong> Photos/Property</li>
+                        {% if plan.video_limit > 0 %}
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> <strong>{{ plan.video_limit }}</strong> Videos/Property</li>
+                        {% endif %}
+                        {% if plan.featured_listings > 0 %}
+                        <li class="mb-2"><i class="fas fa-star text-warning"></i> <strong>{{ plan.featured_listings }}</strong> Featured Listings</li>
+                        {% endif %}
+                        {% if plan.verified_badge %}
+                        <li class="mb-2"><i class="fas fa-check-circle text-info"></i> Verified Badge</li>
+                        {% endif %}
+                        {% if plan.analytics %}
+                        <li class="mb-2"><i class="fas fa-chart-bar text-primary"></i> Analytics</li>
+                        {% endif %}
+                        {% if plan.priority_support %}
+                        <li class="mb-2"><i class="fas fa-headset text-secondary"></i> Priority Support</li>
+                        {% endif %}
+                        {% if plan.social_media_promotion %}
+                        <li class="mb-2"><i class="fas fa-share-alt text-info"></i> Social Promotion</li>
+                        {% endif %}
+                    </ul>
+
+                    <div class="d-grid gap-2">
+                        {% if request.user.is_authenticated %}
+                            {% if current_subscription and current_subscription.plan == plan %}
+                                <a href="{% url 'subscriptions:my_subscription' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-check"></i> Current Plan
+                                </a>
+                            {% else %}
+                                <a href="{% url 'subscriptions:subscribe' plan.plan_type %}" class="btn btn-primary">
+                                    Subscribe Now
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}?next={% url 'subscriptions:subscribe' plan.plan_type %}" class="btn btn-primary">
+                                Login to Subscribe
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not request.user.is_authenticated %}
+    <div class="text-center mt-5 pt-5 border-top">
+        <h5 class="mb-3">Ready to get started?</h5>
+        <p class="text-muted mb-4">Create an account to start listing your properties</p>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-user-plus"></i> Register Now
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border-radius: 12px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+    }
+    .transition {
+        transition: all 0.3s;
+    }
+</style>
+{% endblock %}

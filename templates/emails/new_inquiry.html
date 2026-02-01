@@ -1,0 +1,73 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #0d6efd; margin-bottom: 20px;">🎉 New Inquiry Received!</h2>
+        
+        <p>Hello {{ landlord.first_name|default:landlord.username }},</p>
+        
+        <p>Great news! A potential tenant has shown interest in your property and sent you an inquiry.</p>
+        
+        <div style="background-color: #d1ecf1; border-left: 4px solid #0d6efd; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #0c5460;">
+                <strong>👤 Tenant Name:</strong> {{ tenant.get_full_name|default:tenant.username }}
+            </p>
+            <p style="margin: 10px 0 0 0; color: #0c5460;">
+                <strong>📧 Email:</strong> {{ tenant.email }}
+            </p>
+        </div>
+        
+        <h3 style="color: #333; margin-top: 25px;">Property Inquiry Details</h3>
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Property:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ property.title }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Location:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ property.location }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Monthly Rent:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">₵{{ property.price }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Inquiry Date:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ inquiry_date|date:"F j, Y, g:i a" }}</td>
+            </tr>
+        </table>
+        
+        {% if message %}
+            <h3 style="color: #333; margin-top: 25px;">Tenant's Message:</h3>
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <p style="margin: 0; color: #666; font-style: italic;">{{ message }}</p>
+            </div>
+        {% endif %}
+        
+        <h3 style="color: #333; margin-top: 25px;">Next Steps:</h3>
+        <ol style="color: #666;">
+            <li>Review the tenant's profile and background (if available)</li>
+            <li>Respond to their inquiry with property details or viewing availability</li>
+            <li>Schedule a property viewing if interested</li>
+            <li>Ask screening questions to find the right tenant</li>
+            <li>Proceed with lease agreement if both parties agree</li>
+        </ol>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ chat_url }}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                View & Reply to Inquiry
+            </a>
+        </div>
+        
+        <div style="background-color: #e8f4f8; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #0c5460; font-size: 14px;">
+                <strong>💡 Tip:</strong> Respond to inquiries within 24 hours to show you're an active landlord and increase your chances of securing a good tenant.
+            </p>
+        </div>
+        
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

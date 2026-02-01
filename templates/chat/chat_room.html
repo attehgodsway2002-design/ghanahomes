@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat - {{ chat_room.property.title }} - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <!-- Back Button -->
+            <a href="{% url 'chat:chat_list' %}" class="btn btn-outline-secondary btn-sm mb-3">
+                <i class="fas fa-arrow-left"></i> Back to Messages
+            </a>
+
+            <!-- Property Info Card -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Property Image -->
+                        {% if chat_room.property.images.exists %}
+                            <img src="{{ chat_room.property.images.first.image.url }}" 
+                                 alt="{{ chat_room.property.title }}" 
+                                 class="rounded"
+                                 style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                 style="width: 80px; height: 80px;">
+                                <i class="fas fa-home text-muted fa-2x"></i>
+                            </div>
+                        {% endif %}
+
+                        <!-- Property Details -->
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1">{{ chat_room.property.title }}</h5>
+                            <p class="mb-1 text-muted">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ chat_room.property.area }}, {{ chat_room.property.city }}
+                            </p>
+                            <p class="mb-0">
+                                <strong>₵{{ chat_room.property.price }}</strong>
+                                <span class="text-muted">/month</span>
+                            </p>
+                        </div>
+
+                        <!-- View Button -->
+                        <a href="{% url 'properties:property_detail' chat_room.property.slug %}" 
+                           class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> View Property
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <!-- Chat Card -->
+            <div class="card shadow-sm">
+                <!-- Chat Header -->
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments"></i>
+                        Chat with 
+                        {% if user.is_landlord %}
+                            {{ chat_room.tenant.get_full_name|default:chat_room.tenant.username }}
+                        {% else %}
+                            {{ chat_room.landlord.get_full_name|default:chat_room.landlord.username }}
+                        {% endif %}
+                    </h5>
+                </div>
+
+                <!-- Messages -->
+                <div class="card-body" style="min-height: 400px; max-height: 500px; overflow-y: auto;" id="messages-container">
+                    {% for message in messages %}
+                        <div class="mb-3 {% if message.sender == user %}text-end{% endif %}">
+                            <div class="d-inline-block">
+                                <div class="px-3 py-2 rounded {% if message.sender == user %}bg-primary text-white{% else %}bg-light{% endif %}"
+                                     style="max-width: 75%; word-wrap: break-word;">
+                                    {{ message.content }}
+                                </div>
+                                <div class="mt-1 ps-2">
+                                    <small class="text-muted">
+                                        <strong>{{ message.sender.get_full_name|default:message.sender.username }}</strong>
+                                        • {{ message.created_at|date:"g:i A" }}
+                                        {% if message.sender == user %}
+                                            {% if message.is_read %}
+                                                <i class="fas fa-check-double text-primary"></i>
+                                            {% else %}
+                                                <i class="fas fa-check"></i>
+                                            {% endif %}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-comments fa-2x mb-2"></i>
+                            <p>No messages yet. Start the conversation!</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Message Input Form -->
+                <div class="card-footer bg-white border-top">
+                    <form id="message-form" method="post" action="{% url 'chat:send_message' chat_room.id %}">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ form.content }}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messages-container');
+    const messageForm = document.getElementById('message-form');
+    const contentInput = messageForm.querySelector('input[name="content"]');
+
+    // Scroll to bottom of messages
+    function scrollToBottom() {
+        setTimeout(() => {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }, 100);
+    }
+    scrollToBottom();
+
+    // Focus on input
+    contentInput.focus();
+
+    // Handle message submission
+    messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add new message to container
+                const messageHtml = `
+                    <div class="mb-3 text-end">
+                        <div class="d-inline-block">
+                            <div class="px-3 py-2 rounded bg-primary text-white" style="max-width: 75%; word-wrap: break-word;">
+                                ${data.message.content}
+                            </div>
+                            <div class="mt-1 ps-2">
+                                <small class="text-muted">
+                                    <strong>${data.message.sender}</strong>
+                                    • ${data.message.created_at}
+                                    <i class="fas fa-check"></i>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+                scrollToBottom();
+
+                // Clear input
+                messageForm.reset();
+                contentInput.focus();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
+{% endblock %}

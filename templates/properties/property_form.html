@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Property{% else %}Add New Property{% endif %} - GhanaHomes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-label {
+        font-weight: 500;
+    }
+    .invalid-feedback {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+    #property-map {
+        height: 400px;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+</style>
+<script>
+    function initPropertyMap() {
+        const locationInput = document.getElementById('id_location');
+        let lat = 5.6037, lng = -0.1870;
+        
+        if (locationInput && locationInput.value) {
+            const [pLat, pLng] = locationInput.value.split(',');
+            if (!isNaN(pLat) && !isNaN(pLng)) {
+                lat = parseFloat(pLat);
+                lng = parseFloat(pLng);
+            }
+        }
+        
+        const map = L.map('property-map').setView([lat, lng], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+        
+        marker.on('dragend', function() {
+            const pos = marker.getLatLng();
+            locationInput.value = pos.lat.toFixed(6) + ',' + pos.lng.toFixed(6);
+        });
+        
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            locationInput.value = e.latlng.lat.toFixed(6) + ',' + e.latlng.lng.toFixed(6);
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', initPropertyMap);
+</script>
+
+<script>
+    // Initialize form validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form.needs-validation');
+        if (form) {
+            FormValidator.attachValidation(form);
+            
+            form.addEventListener('submit', function(e) {
+                if (!FormValidator.validate(this)) {
+                    e.preventDefault();
+                    Toast.error('Please fix the errors in the form');
+                    return false;
+                }
+                
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    setButtonLoading(submitBtn, true);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white py-4">
+                    <h3 class="mb-0">
+                        {% if form.instance.pk %}
+                            <i class="fas fa-edit me-2"></i>Edit Property
+                        {% else %}
+                            <i class="fas fa-plus-circle me-2"></i>Add New Property
+                        {% endif %}
+                    </h3>
+                </div>
+                
+                <div class="card-body p-4">
+                    {% if subscription %}
+                        <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Plan Info:</strong> You can add <strong>{{ subscription.plan.property_limit }}</strong> properties on your current plan.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                            <strong>Error:</strong> {{ form.non_field_errors.0 }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information Section -->
+                        <div class="mb-5">
+                            <h5 class="border-bottom pb-3 mb-4">
+                                <i class="fas fa-info-circle text-primary me-2"></i>Basic Information
+                            </h5>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">Title <span class="text-danger">*</span></label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}<div class="invalid-feedback d-block text-danger">{{ form.title.errors.0 }}</div>{% endif %}
+                                    <small class="form-text text-muted d-block mt-1">Give your property an attractive title</small>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.property_type.id_for_label }}" class="form-label fw-bold">Property Type <span class="text-danger">*</span></label>
+                                    {{ form.property_type }}
+                                    {% if form.property_type.errors %}<div class="invalid-feedback d-block text-danger">{{ form.property_type.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}<div class="invalid-feedback d-block text-danger">{{ form.category.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}<div class="invalid-feedback d-block text-danger">{{ form.description.errors.0 }}</div>{% endif %}
+                                    <small class="form-text text-muted d-block mt-1">Provide a detailed description (min. 50 characters)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Section -->
+                        <div class="mb-5">
+                            <h5 class="border-bottom pb-3 mb-4">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i>Location
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.region.id_for_label }}" class="form-label fw-bold">Region <span class="text-danger">*</span></label>
+                                    {{ form.region }}
+                                    {% if form.region.errors %}<div class="invalid-feedback d-block text-danger">{{ form.region.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.city.id_for_label }}" class="form-label fw-bold">City <span class="text-danger">*</span></label>
+                                    {{ form.city }}
+                                    {% if form.city.errors %}<div class="invalid-feedback d-block text-danger">{{ form.city.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.area.id_for_label }}" class="form-label fw-bold">Area <span class="text-danger">*</span></label>
+                                    {{ form.area }}
+                                    {% if form.area.errors %}<div class="invalid-feedback d-block text-danger">{{ form.area.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.address.id_for_label }}" class="form-label fw-bold">Address <span class="text-danger">*</span></label>
+                                    {{ form.address }}
+                                    {% if form.address.errors %}<div class="invalid-feedback d-block text-danger">{{ form.address.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.location.id_for_label }}" class="form-label fw-bold">Map Location</label>
+                                    {{ form.location }}
+                                    {% if form.location.errors %}<div class="invalid-feedback d-block text-danger">{{ form.location.errors.0 }}</div>{% endif %}
+                                    <small class="form-text text-muted d-block mt-1">Click on map or enter coordinates (latitude,longitude)</small>
+                                    <div id="property-map" style="height: 400px; margin-top: 15px; border-radius: 8px; border: 1px solid #ddd;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Section -->
+                        <div class="mb-5">
+                            <h5 class="border-bottom pb-3 mb-4">
+                                <i class="fas fa-dollar-sign text-primary me-2"></i>Pricing
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.price.id_for_label }}" class="form-label fw-bold">Price (per month) <span class="text-danger">*</span></label>
+                                    {{ form.price }}
+                                    {% if form.price.errors %}<div class="invalid-feedback d-block text-danger">{{ form.price.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.currency.id_for_label }}" class="form-label fw-bold">Currency <span class="text-danger">*</span></label>
+                                    {{ form.currency }}
+                                    {% if form.currency.errors %}<div class="invalid-feedback d-block text-danger">{{ form.currency.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ form.negotiable }}
+                                        <label class="form-check-label" for="{{ form.negotiable.id_for_label }}">Negotiable</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Property Details Section -->
+                        <div class="mb-5">
+                            <h5 class="border-bottom pb-3 mb-4">
+                                <i class="fas fa-door-open text-primary me-2"></i>Property Details
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.bedrooms.id_for_label }}" class="form-label fw-bold">Bedrooms</label>
+                                    {{ form.bedrooms }}
+                                    {% if form.bedrooms.errors %}<div class="invalid-feedback d-block text-danger">{{ form.bedrooms.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.bathrooms.id_for_label }}" class="form-label fw-bold">Bathrooms</label>
+                                    {{ form.bathrooms }}
+                                    {% if form.bathrooms.errors %}<div class="invalid-feedback d-block text-danger">{{ form.bathrooms.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.size.id_for_label }}" class="form-label fw-bold">Size (m²)</label>
+                                    {{ form.size }}
+                                    {% if form.size.errors %}<div class="invalid-feedback d-block text-danger">{{ form.size.errors.0 }}</div>{% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.furnishing.id_for_label }}" class="form-label fw-bold">Furnishing</label>
+                                    {{ form.furnishing }}
+                                    {% if form.furnishing.errors %}<div class="invalid-feedback d-block text-danger">{{ form.furnishing.errors.0 }}</div>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Amenities Section -->
+                        <div class="mb-5">
+                            <h5 class="border-bottom pb-3 mb-4">
+                                <i class="fas fa-star text-primary me-2"></i>Amenities
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check">
+                                        {{ form.parking }}
+                                        <label class="form-check-label" for="{{ form.parking.id_for_label }}"><i class="fas fa-car"></i> Parking</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check">
+                                        {{ form.security }}
+                                        <label class="form-check-label" for="{{ form.security.id_for_label }}"><i class="fas fa-shield-alt"></i> Security</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check">
+                                        {{ form.swimming_pool }}
+                                        <label class="form-check-label" for="{{ form.swimming_pool.id_for_label }}"><i class="fas fa-swimming-pool"></i> Pool</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check">
+                                        {{ form.gym }}
+                                        <label class="form-check-label" for="{{ form.gym.id_for_label }}"><i class="fas fa-dumbbell"></i> Gym</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check">
+                                        {{ form.garden }}
+                                        <label class="form-check-label" for="{{ form.garden.id_for_label }}"><i class="fas fa-tree"></i> Garden</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check">
+                                        {{ form.balcony }}
+                                        <label class="form-check-label" for="{{ form.balcony.id_for_label }}"><i class="fas fa-door-open"></i> Balcony</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check">
+                                        {{ form.wifi }}
+                                        <label class="form-check-label" for="{{ form.wifi.id_for_label }}"><i class="fas fa-wifi"></i> WiFi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-check">
+                                        {{ form.air_conditioning }}
+                                        <label class="form-check-label" for="{{ form.air_conditioning.id_for_label }}"><i class="fas fa-snowflake"></i> AC</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Images Section -->
+                        <div class="mb-5">
+                            <h5 class="border-bottom pb-3 mb-4">
+                                <i class="fas fa-image text-primary me-2"></i>Property Images
+                            </h5>
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="id_images" class="form-label fw-bold">Upload Images</label>
+                                    <input type="file" name="images" id="id_images" class="form-control" multiple accept="image/*">
+                                    <small class="form-text text-muted d-block mt-2">
+                                        <i class="fas fa-info-circle"></i>
+                                        Select multiple images. First image will be primary. Max 5MB per image.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Section -->
+                        <div class="d-flex gap-2 justify-content-end pt-4 border-top">
+                            <a href="{% url 'properties:my_properties' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save"></i> {% if form.instance.pk %}Update Property{% else %}Save Property{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

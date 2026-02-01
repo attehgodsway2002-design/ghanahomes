@@ -1,0 +1,66 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<tr>
+    <td style="padding: 20px;">
+        <h2 style="color: #ffc107; margin-bottom: 20px;">⏰ Your Property Listing Has Expired</h2>
+        
+        <p>Hello {{ user.first_name|default:user.username }},</p>
+        
+        <p>Your property listing has expired and is no longer visible to potential tenants. To continue receiving inquiries, please renew your listing.</p>
+        
+        <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 3px;">
+            <p style="margin: 0; color: #856404;">
+                <strong>📌 Status:</strong> Expired
+            </p>
+            <p style="margin: 10px 0 0 0; color: #856404;">
+                <strong>Expired On:</strong> {{ expiry_date|date:"F j, Y" }}
+            </p>
+        </div>
+        
+        <h3 style="color: #333; margin-top: 25px;">Property Information</h3>
+        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Title:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ property.title }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Location:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ property.location }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Original Price:</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">₵{{ property.price }}/month</td>
+            </tr>
+        </table>
+        
+        <h3 style="color: #333; margin-top: 25px;">What Happens Now?</h3>
+        <ul style="color: #666;">
+            <li>Your property is no longer visible in search results</li>
+            <li>Potential tenants cannot contact you about this property</li>
+            <li>Your property data is saved and can be renewed at any time</li>
+            <li>You can modify and repost the property at a later date</li>
+        </ul>
+        
+        <h3 style="color: #333; margin-top: 25px;">Renew Your Listing</h3>
+        <p style="color: #666;">
+            To make your property visible again, you can renew the listing. The renewal process is quick and your property will be reactivated immediately.
+        </p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ renew_url }}" 
+               style="background-color: #0d6efd; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                Renew Listing
+            </a>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="margin: 0; color: #666; font-size: 13px;">
+                <strong>Note:</strong> Your property data is retained for 30 days. After that, you'll need to create a new listing.
+            </p>
+        </div>
+        
+        <p style="margin-top: 30px;">Best regards,<br>The GhanaHomes Team</p>
+    </td>
+</tr>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} Properties - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">{{ category.name }}</h1>
+
+    {% if properties %}
+        <div class="row">
+            {% for prop in properties %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if prop.images.first %}
+                            <img src="{{ prop.images.first.image.url }}" class="card-img-top" alt="{{ prop.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ prop.title }}</h5>
+                            <p class="card-text">{{ prop.description|truncatewords:20 }}</p>
+                            <a href="{% url 'properties:property_detail' prop.slug %}" class="btn btn-outline-primary">View</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No properties in this category yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - GhanaHomes{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="mb-4">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </h2>
+
+        {% if user.is_landlord %}
+        <!-- Landlord Dashboard -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center p-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <i class="fas fa-building fa-3x mb-3"></i>
+                    <h3 class="mb-0">{{ total_properties }}</h3>
+                    <p class="mb-0">Total Properties</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center p-4" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                    <h3 class="mb-0">{{ available_properties }}</h3>
+                    <p class="mb-0">Available</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center p-4" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                    <i class="fas fa-eye fa-3x mb-3"></i>
+                    <h3 class="mb-0">{{ total_views }}</h3>
+                    <p class="mb-0">Total Views</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm text-center p-4" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+                    <i class="fas fa-heart fa-3x mb-3"></i>
+                    <h3 class="mb-0">{{ total_favorites }}</h3>
+                    <p class="mb-0">Favorites</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscription Status -->
+        {% if subscription %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="mb-2"><i class="fas fa-crown text-warning"></i> {{ subscription.plan.name }}</h5>
+                        <p class="text-muted mb-0">
+                            Active until {{ subscription.end_date|date:"M d, Y" }} | 
+                            Properties: {{ subscription.property_count }}/{{ subscription.plan.property_limit }}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <a href="{% url 'subscriptions:my_subscription' %}" class="btn btn-primary">
+                            <i class="fas fa-chart-line"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> 
+            You don't have an active subscription. 
+            <a href="{% url 'subscriptions:plans' %}" class="alert-link">Subscribe now</a> to start posting properties!
+        </div>
+        {% endif %}
+
+        <!-- Recent Properties -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Recent Properties</h5>
+                    <a href="{% url 'properties:my_properties' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if recent_properties %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Location</th>
+                                <th>Price</th>
+                                <th>Views</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for property in recent_properties %}
+                            <tr>
+                                <td>{{ property.title|truncatewords:5 }}</td>
+                                <td>{{ property.city }}</td>
+                                <td>₵{{ property.price|floatformat:0 }}</td>
+                                <td>{{ property.views }}</td>
+                                <td>
+                                    <span class="badge bg-{% if property.status == 'available' %}success{% else %}secondary{% endif %}">
+                                        {{ property.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'properties:property_detail' property.slug %}" class="btn btn-sm btn-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No properties yet. <a href="{% url 'properties:property_create' %}">Post your first property</a></p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Tenant Dashboard -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm text-center p-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <i class="fas fa-heart fa-3x mb-3"></i>
+                    <h3 class="mb-0">{{ favorites_count }}</h3>
+                    <p class="mb-0">Favorite Properties</p>
+                    <a href="{% url 'properties:favorites_list' %}" class="btn btn-light mt-3">View Favorites</a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm text-center p-4" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                    <i class="fas fa-comments fa-3x mb-3"></i>
+                    <h3 class="mb-0">Messages</h3>
+                    <p class="mb-0">Chat with Landlords</p>
+                    <a href="{% url 'chat:chat_list' %}" class="btn btn-light mt-3">View Messages</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Favorites -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-heart"></i> Recent Favorites</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_favorites %}
+                <div class="row g-3">
+                    {% for fav in recent_favorites %}
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="row g-0">
+                                <div class="col-4">
+                                    {% if fav.property.images.first %}
+                                    <img src="{{ fav.property.images.first.image.url }}" class="img-fluid h-100" style="object-fit: cover;">
+                                    {% else %}
+                                    <div class="bg-secondary h-100"></div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ fav.property.title|truncatewords:4 }}</h6>
+                                        <p class="card-text small text-muted">
+                                            <i class="fas fa-map-marker-alt"></i> {{ fav.property.city }}
+                                        </p>
+                                        <p class="text-primary fw-bold mb-2">₵{{ fav.property.price|floatformat:0 }}/month</p>
+                                        <a href="{% url 'properties:property_detail' fav.property.slug %}" class="btn btn-sm btn-primary">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No favorites yet. <a href="{% url 'properties:property_list' %}">Browse properties</a></p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

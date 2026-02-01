@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics & Reports - Admin - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2">Analytics & Reports</h1>
+            <p class="text-muted">Platform performance metrics and trends</p>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'admin:index' %}" class="btn btn-secondary">Back to Admin</a>
+        </div>
+    </div>
+
+    <!-- Revenue Trends -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Revenue Trends (Last 12 Months)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueTrendChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Growth -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">User Growth Trend (Last 12 Months)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="userGrowthChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Breakdown -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Subscription Breakdown by Plan</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Plan Name</th>
+                                <th>Active Subscriptions</th>
+                                <th>Total Revenue</th>
+                                <th>Average Revenue per Subscription</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plan in subscription_breakdown %}
+                            <tr style="cursor: pointer;" onclick="window.location.href='{% url 'admin:subscriptions_subscription_changelist' %}?plan={{ plan.plan_id }}'">
+                                <td><strong>{{ plan.plan__name }}</strong></td>
+                                <td><span class="badge bg-primary">{{ plan.count }}</span></td>
+                                <td><strong>₵{{ plan.total_revenue|floatformat:2 }}</strong></td>
+                                <td>₵{{ plan.avg_revenue|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">No subscription data</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    // Revenue Trend Chart
+    const revenueTrendData = {{ revenue_trend_json|safe }};
+    const revenueTrendCtx = document.getElementById('revenueTrendChart').getContext('2d');
+    new Chart(revenueTrendCtx, {
+        type: 'bar',
+        data: {
+            labels: revenueTrendData.map(d => d.month),
+            datasets: [{
+                label: 'Monthly Revenue (₵)',
+                data: revenueTrendData.map(d => d.revenue),
+                backgroundColor: '#198754',
+                borderColor: '#198754',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // User Growth Chart
+    const userGrowthData = {{ user_growth_json|safe }};
+    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(userGrowthCtx, {
+        type: 'line',
+        data: {
+            labels: userGrowthData.map(d => d.month),
+            datasets: [{
+                label: 'New Users',
+                data: userGrowthData.map(d => d.count),
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

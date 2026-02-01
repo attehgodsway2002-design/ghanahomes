@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Properties - GhanaHomes{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Filters -->
+            <div class="col-lg-3">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-filter"></i> Filter Properties</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get">
+                            <div class="mb-3">
+                                <label class="form-label">Search</label>
+                                {{ form.query }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Property Type</label>
+                                {{ form.property_type }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Region</label>
+                                {{ form.region }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">City</label>
+                                {{ form.city }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Price Range</label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        {{ form.min_price }}
+                                    </div>
+                                    <div class="col-6">
+                                        {{ form.max_price }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Bedrooms</label>
+                                {{ form.bedrooms }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Bathrooms</label>
+                                {{ form.bathrooms }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Furnishing</label>
+                                {{ form.furnishing }}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i> Apply Filters
+                            </button>
+                            
+                            <a href="{% url 'properties:property_list' %}" class="btn btn-outline-secondary w-100 mt-2">
+                                <i class="fas fa-redo"></i> Reset
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Listings -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2><i class="fas fa-building"></i> Available Properties</h2>
+                        <p class="text-muted mb-0">Found {{ total_count }} properties</p>
+                    </div>
+                    <div>
+                        <select class="form-select" onchange="this.form.submit()">
+                            <option>Sort by: Latest</option>
+                            <option>Price: Low to High</option>
+                            <option>Price: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    {% for property in properties %}
+                    <div class="col-md-6">
+                        <div class="property-card">
+                            <div class="property-image">
+                                {% if property.images.first %}
+                                <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}">
+                                {% else %}
+                                <img src="https://via.placeholder.com/400x250?text=No+Image" alt="{{ property.title }}">
+                                {% endif %}
+                                
+                                {% if property.is_featured %}
+                                <span class="property-badge">
+                                    <i class="fas fa-star"></i> Featured
+                                </span>
+                                {% endif %}
+                                
+                                <div class="property-price">
+                                    ₵{{ property.price|floatformat:0 }}/month
+                                </div>
+                            </div>
+                            
+                            <div class="property-body">
+                                <h5 class="property-title">{{ property.title }}</h5>
+                                
+                                <div class="property-location">
+                                    <i class="fas fa-map-marker-alt text-primary"></i>
+                                    {{ property.area }}, {{ property.city }}, {{ property.region }}
+                                </div>
+                                
+                                <div class="property-features">
+                                    <span><i class="fas fa-bed"></i> {{ property.bedrooms }} Beds</span>
+                                    <span><i class="fas fa-bath"></i> {{ property.bathrooms }} Baths</span>
+                                    <span><i class="fas fa-ruler-combined"></i> {{ property.size }}m²</span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <a href="{% url 'properties:property_detail' property.slug %}" class="btn btn-primary">
+                                        View Details
+                                    </a>
+                                    <div class="text-muted small">
+                                        <i class="fas fa-eye"></i> {{ property.views }} views
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle fa-3x mb-3"></i>
+                            <h5>No properties found</h5>
+                            <p>Try adjusting your search filters</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if properties.has_other_pages %}
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if properties.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ properties.previous_page_number }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in properties.paginator.page_range %}
+                        <li class="page-item {% if properties.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% if properties.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ properties.next_page_number }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Dashboard - GhanaHomes{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Payment Dashboard</h1>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Total Payments</h6>
+                    <h2>{{ total_payments }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Total Spent</h6>
+                    <h2>₵{{ total_spent|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Completed</h6>
+                    <h2>{{ completed_payments }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h6 class="card-title">Pending</h6>
+                    <h2>{{ pending_payments }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Failed Payments</h6>
+                    <h3 class="text-danger">{{ failed_payments }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Average Payment</h6>
+                    <h3>₵{{ avg_payment|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">This Month</h6>
+                    <h3>{{ payments_this_month }} payments</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Status Chart -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Payments by Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Status Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <td><span class="badge bg-success">Completed</span></td>
+                                <td class="text-end"><strong>{{ payments_by_status.completed }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-warning">Pending</span></td>
+                                <td class="text-end"><strong>{{ payments_by_status.pending }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-danger">Failed</span></td>
+                                <td class="text-end"><strong>{{ payments_by_status.failed }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-secondary">Cancelled</span></td>
+                                <td class="text-end"><strong>{{ payments_by_status.cancelled }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Payments -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Payments</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_payments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Method</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_payments %}
+                                <tr>
+                                    <td><code>{{ payment.paystack_reference }}</code></td>
+                                    <td>₵{{ payment.amount|floatformat:2 }}</td>
+                                    <td>
+                                        {% if payment.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif payment.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif payment.status == 'failed' %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ payment.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ payment.payment_method|default:"N/A"|title }}</td>
+                                    <td>{{ payment.created_at|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        <a href="{% url 'payments:history' %}" class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No payments found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Links -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'payments:history' %}" class="btn btn-primary">View All Payments</a>
+            <a href="{% url 'subscriptions:plans' %}" class="btn btn-outline-primary">View Subscription Plans</a>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js for visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('statusChart');
+        if (ctx) {
+            const data = {
+                labels: ['Completed', 'Pending', 'Failed', 'Cancelled'],
+                datasets: [{
+                    label: 'Payment Count',
+                    data: [
+                        {{ payments_by_status.completed }},
+                        {{ payments_by_status.pending }},
+                        {{ payments_by_status.failed }},
+                        {{ payments_by_status.cancelled }}
+                    ],
+                    backgroundColor: [
+                        '#198754',  // success green
+                        '#ffc107',  // warning yellow
+                        '#dc3545',  // danger red
+                        '#6c757d'   // secondary gray
+                    ],
+                    borderColor: [
+                        '#0d3622',
+                        '#d39e00',
+                        '#842029',
+                        '#565e64'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

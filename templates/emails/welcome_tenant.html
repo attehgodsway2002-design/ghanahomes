@@ -1,0 +1,49 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="color: #FFA500; margin-top: 0;">Welcome to GhanaHomes - Find Your Perfect Home! 🏡</h2>
+<p>Hello {{ user.first_name|default:user.username }},</p>
+<p>Welcome to GhanaHomes! You're now registered as a <strong>Tenant</strong>. Here's what you can do on our platform:</p>
+
+<div style="background-color: #f8f9fa; border-left: 4px solid #FFA500; padding: 15px; margin: 20px 0; border-radius: 3px;">
+    <p style="margin: 0; color: #333; font-size: 14px;">
+        <strong>🎯 Your Capabilities:</strong>
+    </p>
+    <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #666; font-size: 14px;">
+        <li>Browse thousands of rental properties</li>
+        <li>Filter by location, price, bedrooms, amenities, and more</li>
+        <li>Save your favorite properties for later</li>
+        <li>View detailed property information and images</li>
+        <li>Message landlords directly to inquire about properties</li>
+        <li>Chat in real-time with property managers</li>
+        <li>Write and read property reviews from other tenants</li>
+        <li>Get notifications about new properties matching your criteria</li>
+    </ul>
+</div>
+
+<h3 style="color: #333; margin-top: 25px;">Getting Started:</h3>
+<ol style="color: #666; font-size: 14px;">
+    <li><strong>Complete Your Profile</strong> - Add your photo and contact information</li>
+    <li><strong>Search for Properties</strong> - Browse our listings or use filters to find properties</li>
+    <li><strong>Save Favorites</strong> - Bookmark properties you're interested in</li>
+    <li><strong>Contact Landlords</strong> - Message landlords to ask questions or schedule viewings</li>
+    <li><strong>Negotiate Terms</strong> - Chat and negotiate rental terms directly</li>
+    <li><strong>Leave Reviews</strong> - Help other tenants with property reviews</li>
+</ol>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{ browse_url }}" style="background-color: #FFA500; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Start Browsing Properties</a>
+</div>
+
+<div style="background-color: #e8f4f8; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0; border-radius: 3px;">
+    <p style="margin: 0; color: #0c5460; font-size: 14px;">
+        <strong>💡 Pro Tip:</strong> Use the search filters to narrow down properties by your budget, location, and number of bedrooms. This will save you time!
+    </p>
+</div>
+
+<p style="color: #666; font-size: 14px; margin-top: 20px;">
+    <strong>Questions?</strong> Check our <a href="#" style="color: #FFA500; text-decoration: none;">Tenant Help Center</a> or <a href="#" style="color: #FFA500; text-decoration: none;">contact support</a>.
+</p>
+
+<p>Best regards,<br><strong>The GhanaHomes Team</strong></p>
+{% endblock %}
