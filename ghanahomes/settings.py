@@ -43,12 +43,17 @@ except Exception:
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s8k!jl^p*124=y@s#z0kf9+p%d45y_p7ry-14kz=k&%n^)iq!1'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-s8k!jl^p*124=y@s#z0kf9+p%d45y_p7ry-14kz=k&%n^)iq!1')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'ghhomes.pythonanywhere.com',
+    'www.ghhomes.pythonanywhere.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 # Optional: populate sensitive settings from environment
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY', '')
@@ -63,14 +68,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-         # Project apps
+    # Project apps
     'accounts',
     'chat',
     'properties',
     'payments',
     'subscriptions',
-        # 'django_q',  # Temporarily disabled - install with: pip install django-q==1.3.9
-    ]
+    # 'django_q',  # Temporarily disabled - install with: pip install django-q==1.3.9
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -94,6 +99,23 @@ SECURE_CONTENT_SECURITY_POLICY = {
     'img-src': ("'self'", 'data:', 'https:'),
 }
 X_FRAME_OPTIONS = 'DENY'
+
+# CSRF and CORS settings for ghhomes.pythonanywhere.com
+CSRF_TRUSTED_ORIGINS = [
+    'https://ghhomes.pythonanywhere.com',
+    'https://www.ghhomes.pythonanywhere.com',
+]
+
+# SSL/TLS Settings (for production)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+    CSRF_COOKIE_HTTPONLY = True     # Prevent JavaScript access to CSRF cookie
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 ROOT_URLCONF = 'ghanahomes.urls'
 
@@ -211,7 +233,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'realhuntsmen.tech@gmail.co
 OFFICIAL_EMAIL = 'realhuntsmen.tech@gmail.com'
 OFFICIAL_PHONE = '+233 55 606 7555'
 # Public site URL used in emails
-SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
+SITE_URL = os.getenv('SITE_URL', 'https://ghhomes.pythonanywhere.com')
 
 # Django Channels
 ASGI_APPLICATION = 'ghanahomes.asgi.application'
@@ -250,16 +272,25 @@ LOGIN_REDIRECT_URL = 'accounts:dashboard'
 LOGOUT_REDIRECT_URL = 'home'
 
 # Cache Configuration
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'ghanahomes-cache',
-        'TIMEOUT': 300,  # 5 minutes default timeout
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000
+# Use Redis for caching if available, otherwise fall back to local memory
+if os.getenv('REDIS_URL'):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
         }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'ghanahomes-cache',
+            'TIMEOUT': 300,  # 5 minutes default timeout
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000
+            }
+        }
+    }
 
 # Cache timeout for specific views
 CACHE_TIMEOUTS = {
