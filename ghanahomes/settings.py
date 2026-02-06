@@ -49,11 +49,22 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-s8k!jl^p*124=y@s#z0kf9+p%d
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
-    'ghhomes.pythonanywhere.com',
-    'www.ghhomes.pythonanywhere.com',
+    # Local development
     'localhost',
     '127.0.0.1',
+    '::1',
+    # PythonAnywhere test domains
+    '*.pythonanywhere.com',
+    # Render, Railway, Heroku, and other platforms
+    '*.onrender.com',
+    '*.railway.app',
+    '*.herokuapp.com',
+    '*.repl.co',
+    # Environment-specific
+    os.getenv('ALLOWED_HOST', ''),
 ]
+# Filter out empty strings
+ALLOWED_HOSTS = [host for host in ALLOWED_HOSTS if host]
 
 # Optional: populate sensitive settings from environment
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY', '')
@@ -100,11 +111,22 @@ SECURE_CONTENT_SECURITY_POLICY = {
 }
 X_FRAME_OPTIONS = 'DENY'
 
-# CSRF and CORS settings for ghhomes.pythonanywhere.com
+# CSRF and CORS settings for test hosting platforms
 CSRF_TRUSTED_ORIGINS = [
-    'https://ghhomes.pythonanywhere.com',
-    'https://www.ghhomes.pythonanywhere.com',
+    'https://*.pythonanywhere.com',
+    'http://*.pythonanywhere.com',
+    'https://*.onrender.com',
+    'http://*.onrender.com',
+    'https://*.railway.app',
+    'http://*.railway.app',
+    'https://*.herokuapp.com',
+    'http://*.herokuapp.com',
+    'https://*.repl.co',
+    'http://*.repl.co',
 ]
+# Add environment-specific origin if provided
+if os.getenv('CSRF_TRUSTED_ORIGIN'):
+    CSRF_TRUSTED_ORIGINS.append(os.getenv('CSRF_TRUSTED_ORIGIN'))
 
 # SSL/TLS Settings (for production)
 if not DEBUG:
@@ -233,7 +255,8 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'realhuntsmen.tech@gmail.co
 OFFICIAL_EMAIL = 'realhuntsmen.tech@gmail.com'
 OFFICIAL_PHONE = '+233 55 606 7555'
 # Public site URL used in emails
-SITE_URL = os.getenv('SITE_URL', 'https://ghhomes.pythonanywhere.com')
+# Automatically detect from request in production, fallback to environment variable
+SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
 
 # Django Channels
 ASGI_APPLICATION = 'ghanahomes.asgi.application'
