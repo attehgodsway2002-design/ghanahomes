@@ -6,10 +6,9 @@ pypaystack2==3.0.2
 django-crispy-forms==2.3
 crispy-bootstrap5==0.7
 whitenoise==6.8.2
-django-ratelimit>=3.0.0,<4.0.0
+django-ratelimit>=4.1.0
 sentry-sdk==2.57.0
 gunicorn==23.0.0
-django-ratelimit
 pip freeze > requirements.txt
 
 # Optional: Real-time features (requires separate setup on PythonAnywhere)
