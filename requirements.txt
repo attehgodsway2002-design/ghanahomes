@@ -8,6 +8,7 @@ crispy-bootstrap5==0.7
 whitenoise==6.8.2
 django-ratelimit>=3.0.0,<4.0.0
 sentry-sdk==2.57.0
+gunicorn==23.0.0
 
 # Optional: Real-time features (requires separate setup on PythonAnywhere)
 # channels==4.1.0
