@@ -10,7 +10,8 @@ class SubscriptionForm(forms.Form):
         choices=SubscriptionPlan.DURATION_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
-    auto_renew = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    auto_renew = forms.TypedChoiceField(
+        choices=(('false', 'No'), ('true', 'Yes')),
+        coerce=lambda value: value == 'true',
+        widget=forms.HiddenInput()
     )

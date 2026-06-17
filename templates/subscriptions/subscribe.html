@@ -3,98 +3,266 @@
 
 {% block title %}Subscribe - {{ plan.name }} - GhanaHomes{% endblock %}
 
+{% block extra_css %}
+<style>
+  .sub-pg { max-width: 520px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+  .steps { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 2.5rem; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; position: relative; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; z-index: 1; position: relative; }
+  .step.done .step-num { background: #1D9E75; color: #fff; }
+  .step.active .step-num { background: #212529; color: #fff; }
+  .step.idle .step-num { background: #f8f9fa; border: 1px solid #dee2e6; color: #6c757d; }
+  .step-label { font-size: 11px; color: #6c757d; white-space: nowrap; }
+  .step.active .step-label { color: #212529; font-weight: 500; }
+  .connector { flex: 1; height: 1px; background: #dee2e6; margin-top: -14px; max-width: 48px; }
+  .connector.done { background: #1D9E75; }
+  .plan-card { background: #fff; border: 1px solid #e9ecef; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 1rem; }
+  .plan-icon { width: 44px; height: 44px; border-radius: 8px; background: #E1F5EE; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .plan-icon i { font-size: 20px; color: #0F6E56; }
+  .plan-name { font-size: 15px; font-weight: 600; color: #212529; margin-bottom: 2px; }
+  .plan-desc { font-size: 13px; color: #6c757d; line-height: 1.5; margin-bottom: 8px; }
+  .plan-features { display: flex; flex-wrap: wrap; gap: 6px; }
+  .feat { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #0F6E56; background: #E1F5EE; padding: 3px 8px; border-radius: 20px; }
+  .price-pill { margin-left: auto; flex-shrink: 0; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 20px; padding: 4px 12px; font-size: 13px; font-weight: 500; color: #212529; white-space: nowrap; }
+  .form-card { background: #fff; border: 1px solid #e9ecef; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .field-label { font-size: 13px; font-weight: 500; color: #212529; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .field-label i { font-size: 15px; color: #6c757d; }
+  .field-group { margin-bottom: 1.25rem; }
+  .dur-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
+  .dur-opt { border: 1px solid #dee2e6; border-radius: 8px; padding: 0.75rem 0.5rem; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .dur-opt:hover { border-color: #adb5bd; }
+  .dur-opt.sel { border: 2px solid #212529; background: #f8f9fa; }
+  .dur-opt .dur-name { font-size: 13px; font-weight: 500; color: #212529; }
+  .dur-opt .dur-save { font-size: 11px; color: #0F6E56; margin-top: 2px; }
+  .dur-opt .dur-price { font-size: 12px; color: #6c757d; margin-top: 1px; }
+  .divider { border: none; border-top: 1px solid #e9ecef; margin: 1.25rem 0; }
+  .toggle-row { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+  .toggle-wrap { position: relative; width: 36px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+  .toggle-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .t-slider { position: absolute; inset: 0; border-radius: 20px; background: #dee2e6; transition: background 0.2s; cursor: pointer; }
+  .t-slider:before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; border-radius: 50%; background: white; transition: transform 0.2s; }
+  input:checked + .t-slider { background: #1D9E75; }
+  input:checked + .t-slider:before { transform: translateX(16px); }
+  .toggle-text .t1 { font-size: 14px; font-weight: 500; color: #212529; }
+  .toggle-text .t2 { font-size: 12px; color: #6c757d; margin-top: 2px; line-height: 1.4; }
+  .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .total-label { font-size: 13px; color: #6c757d; }
+  .total-amount { font-size: 18px; font-weight: 600; color: #212529; }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-back { border: 1px solid #dee2e6; background: transparent; border-radius: 8px; padding: 0.7rem 1rem; font-size: 14px; color: #212529; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; transition: background 0.15s; }
+  .btn-back:hover { background: #f8f9fa; color: #212529; }
+  .btn-pay { border: none; background: #212529; border-radius: 8px; padding: 0.7rem 1rem; font-size: 14px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; transition: opacity 0.15s; width: 100%; }
+  .btn-pay:hover { opacity: 0.85; }
+  .trust-row { display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap; }
+  .trust-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #6c757d; }
+  .trust-item i { font-size: 14px; color: #1D9E75; }
+  @media (max-width: 480px) {
+    .trust-row { gap: 1rem; }
+    .actions { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="text-center mb-5">
-                <h1 class="mb-3">Subscribe to {{ plan.name }}</h1>
-                <p class="text-muted">Complete your subscription setup</p>
-            </div>
+<div class="sub-pg">
 
-            {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            <!-- Plan Summary -->
-            <div class="card shadow-sm mb-4 border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">{{ plan.name }} Plan</h5>
-                        <span class="badge bg-primary">
-                            {% if plan.is_free %}
-                                Free Trial
-                            {% else %}
-                                ₵{{ plan.price_monthly }}/month
-                            {% endif %}
-                        </span>
-                    </div>
-                    <p class="text-muted small mb-0">{{ plan.description }}</p>
-                </div>
-            </div>
-
-            <!-- Subscription Form -->
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="plan_type" value="{{ plan.plan_type }}">
-
-                        <div class="mb-4">
-                            <label for="{{ form.duration.id_for_label }}" class="form-label fw-bold">
-                                <i class="fas fa-calendar"></i> Duration
-                            </label>
-                            {{ form.duration }}
-                            {% if form.duration.errors %}
-                                <div class="text-danger small mt-2">{{ form.duration.errors }}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="form-check mb-4">
-                            {{ form.auto_renew }}
-                            <label class="form-check-label" for="{{ form.auto_renew.id_for_label }}">
-                                <i class="fas fa-sync-alt"></i> <strong>Auto-renew subscription</strong>
-                                <p class="text-muted small mt-1 mb-0">Your subscription will automatically renew when it expires</p>
-                            </label>
-                        </div>
-
-                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-between">
-                            <a href="{% url 'subscriptions:plans' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left"></i> Back
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-credit-card"></i> Continue to Payment
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Features List -->
-            <div class="mt-4 p-3 bg-light rounded">
-                <h6 class="mb-3"><i class="fas fa-list"></i> Plan Features:</h6>
-                <ul class="mb-0 small">
-                    <li><strong>{{ plan.property_limit }}</strong> Property Listings</li>
-                    <li><strong>{{ plan.photo_limit }}</strong> Photos per Property</li>
-                    {% if plan.featured_listings > 0 %}
-                    <li><strong>{{ plan.featured_listings }}</strong> Featured Listings</li>
-                    {% endif %}
-                    {% if plan.verified_badge %}
-                    <li>Verified Badge</li>
-                    {% endif %}
-                    {% if plan.analytics %}
-                    <li>Advanced Analytics</li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
+  {% if messages %}
+  <div class="mb-4">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step done">
+      <div class="step-num"><i class="fas fa-check"></i></div>
+      <span class="step-label">Select plan</span>
+    </div>
+    <div class="connector done"></div>
+    <div class="step active">
+      <div class="step-num">2</div>
+      <span class="step-label">Configure</span>
+    </div>
+    <div class="connector"></div>
+    <div class="step idle">
+      <div class="step-num">3</div>
+      <span class="step-label">Payment</span>
+    </div>
+    <div class="connector"></div>
+    <div class="step idle">
+      <div class="step-num">4</div>
+      <span class="step-label">Done</span>
+    </div>
+  </div>
+
+  <!-- Plan summary -->
+  <div class="plan-card">
+    <div class="plan-icon"><i class="fas fa-building"></i></div>
+    <div style="flex: 1; min-width: 0;">
+      <div class="plan-name">{{ plan.name }}</div>
+      <div class="plan-desc">{{ plan.description }}</div>
+      <div class="plan-features">
+        <span class="feat"><i class="fas fa-home"></i> {{ plan.property_limit }} listings</span>
+        <span class="feat"><i class="fas fa-image"></i> {{ plan.photo_limit }} photos</span>
+        {% if plan.video_limit > 0 %}
+        <span class="feat"><i class="fas fa-video"></i> {{ plan.video_limit }} videos</span>
+        {% endif %}
+        {% if plan.featured_listings > 0 %}
+        <span class="feat"><i class="fas fa-star"></i> {{ plan.featured_listings }} featured</span>
+        {% endif %}
+        {% if plan.verified_badge %}
+        <span class="feat"><i class="fas fa-badge-check"></i> Verified badge</span>
+        {% endif %}
+        {% if plan.analytics %}
+        <span class="feat"><i class="fas fa-chart-bar"></i> Analytics</span>
+        {% endif %}
+        {% if plan.priority_support %}
+        <span class="feat"><i class="fas fa-headset"></i> Priority support</span>
+        {% endif %}
+        {% if plan.social_media_promotion %}
+        <span class="feat"><i class="fas fa-share-alt"></i> Social promotion</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="price-pill">
+      {% if plan.is_free %}Free trial{% else %}₵{{ plan.price_monthly }}/mo{% endif %}
+    </div>
+  </div>
+
+  <!-- Subscription form -->
+  <div class="form-card">
+    <form method="post" id="subscribeForm">
+      {% csrf_token %}
+      <input type="hidden" name="plan_type" value="{{ plan.plan_type }}">
+      <input type="hidden" name="duration" id="durationInput" value="monthly">
+      <input type="hidden" name="auto_renew" id="autoRenewInput" value="{% if plan.is_free %}false{% else %}true{% endif %}">
+
+      {% if not plan.is_free %}
+      <!-- Duration picker -->
+      <div class="field-group">
+        <div class="field-label"><i class="fas fa-calendar-alt"></i> Billing duration</div>
+        <div class="dur-grid">
+          <div class="dur-opt sel" data-duration="monthly" data-price="{{ plan.price_monthly }}" onclick="selectDur(this)">
+            <div class="dur-name">Monthly</div>
+            <div class="dur-price">₵{{ plan.price_monthly }}/mo</div>
+          </div>
+          <div class="dur-opt" data-duration="quarterly" data-price="{{ plan.price_quarterly|default:'0' }}" onclick="selectDur(this)">
+            <div class="dur-name">Quarterly</div>
+            <div class="dur-save">Billed every 3 months</div>
+            <div class="dur-price" id="quarterlyPrice"></div>
+          </div>
+          <div class="dur-opt" data-duration="yearly" data-price="{{ plan.price_yearly|default:'0' }}" onclick="selectDur(this)">
+            <div class="dur-name">Yearly</div>
+            <div class="dur-save">Billed every 12 months</div>
+            <div class="dur-price" id="yearlyPrice"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      {% if not plan.is_free %}
+      <!-- Auto-renew toggle -->
+      <label class="toggle-row">
+        <div class="toggle-wrap">
+          <input type="checkbox" id="autoRenewToggle" checked onchange="updateAutoRenew(this)">
+          <span class="t-slider"></span>
+        </div>
+        <div class="toggle-text">
+          <div class="t1">Auto-renew</div>
+          <div class="t2">We'll remind you 7 days before renewal. Cancel anytime.</div>
+        </div>
+      </label>
+
+      <div class="divider"></div>
+      <div class="total-row">
+        <span class="total-label">Total today</span>
+        <span class="total-amount" id="totalDisplay">₵{{ plan.price_monthly }}</span>
+      </div>
+      {% endif %}
+      {% else %}
+      <div class="field-group">
+        <div class="field-label"><i class="fas fa-info-circle"></i> Free trial details</div>
+        <div class="dur-price">Enjoy 30 days free access to {{ plan.name }}. No payment required.</div>
+      </div>
+      {% endif %}
+
+      <div class="actions">
+        <a href="{% url 'subscriptions:plans' %}" class="btn-back">
+          <i class="fas fa-arrow-left"></i>
+          Back
+        </a>
+        <button type="submit" class="btn-pay">
+          <i class="fas fa-lock"></i>
+          {% if plan.is_free %}Activate free trial{% else %}Continue to payment{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Trust strip -->
+  <div class="trust-row">
+    <span class="trust-item"><i class="fas fa-shield-alt"></i> Secure checkout</span>
+    <span class="trust-item"><i class="fas fa-times-circle"></i> Cancel anytime</span>
+    <span class="trust-item"><i class="fas fa-headset"></i> Local support</span>
+  </div>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const monthlyPrice = parseFloat("{{ plan.price_monthly|default:'0' }}");
+  const quarterlyPriceValue = parseFloat("{{ plan.price_quarterly|default:'0' }}");
+  const yearlyPriceValue = parseFloat("{{ plan.price_yearly|default:'0' }}");
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const quarterlyPriceEl = document.getElementById('quarterlyPrice');
+    const yearlyPriceEl = document.getElementById('yearlyPrice');
+    if (quarterlyPriceEl) {
+      const quarterlyPrice = quarterlyPriceValue > 0 ? quarterlyPriceValue : monthlyPrice * 3;
+      quarterlyPriceEl.textContent = '₵' + quarterlyPrice.toFixed(2) + ' / 3 mo';
+    }
+    if (yearlyPriceEl) {
+      const yearlyPrice = yearlyPriceValue > 0 ? yearlyPriceValue : monthlyPrice * 12;
+      yearlyPriceEl.textContent = '₵' + yearlyPrice.toFixed(2) + ' / 12 mo';
+    }
+    updateTotal();
+  });
+
+  function selectDur(el) {
+    document.querySelectorAll('.dur-opt').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+    document.getElementById('durationInput').value = el.dataset.duration;
+    updateTotal();
+  }
+
+  function updateAutoRenew(cb) {
+    document.getElementById('autoRenewInput').value = cb.checked ? 'true' : 'false';
+  }
+
+  function updateTotal() {
+    const sel = document.querySelector('.dur-opt.sel');
+    const totalDisplay = document.getElementById('totalDisplay');
+    if (!sel || !totalDisplay) return;
+
+    const duration = sel.dataset.duration;
+    const optionPrice = parseFloat(sel.dataset.price || '0');
+    let amount = 0;
+
+    if (duration === 'monthly') {
+      amount = optionPrice;
+    } else if (duration === 'quarterly') {
+      amount = optionPrice > 0 ? optionPrice : monthlyPrice * 3;
+    } else if (duration === 'yearly') {
+      amount = optionPrice > 0 ? optionPrice : monthlyPrice * 12;
+    }
+
+    totalDisplay.textContent = '₵' + amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  }
+</script>
 {% endblock %}
